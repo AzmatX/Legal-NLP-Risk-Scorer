@@ -3,7 +3,7 @@ name: Dataset Parsing
 about: Dataset parsing with CUAD ingestion pipeline
 title: "[Dataset] Dataset Parsing with CUAD ingestion pipeline"
 labels: [dataset, backend]
-assignees: [Ahmad]
+assignees: [Lakshya]
 ---
 
 ## Description
