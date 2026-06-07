@@ -26,11 +26,11 @@ git checkout -b feature/integration-testing
 
 ## Team Ownership
 
-- Ahmad -> Dataset Cleaning
-- Sahasra -> OCR Pipeline
-- Sandeep -> NER Extraction
-- Azmat -> FastAPI Backend
-- Azmat -> Clause Classification, Risk Scoring and Integration
+- Lakshya -> Dataset & Cleaning
+- Ahmad -> OCR Pipeline
+- Sahasra -> NER Extraction
+- Sandeep -> FastAPI Backend
+- Azmat -> Clause Classification & Risk Scoring
 
 ## Milestones
 
@@ -48,26 +48,32 @@ git checkout -b feature/integration-testing
 
 ## Daily Commit Roadmap
 
-### Ahmad (Dataset)
+### Lakshya (Dataset)
 - Day 1: Dataset loader + schema
 - Day 2: Cleaning and validation
 - Day 3: CUAD parsing tests
 - Day 4: Dataset versioning docs
 
-### Sahasra (OCR)
+### Ahmad (OCR)
 - Day 1: OCR service abstraction
 - Day 2: PDF OCR adapter
 - Day 3: DOCX extraction path
 - Day 4: OCR benchmark report
 
-### Sandeep (NER)
+### Sahasra (NER)
 - Day 1: NER baseline pipeline
 - Day 2: Entity label mapping
 - Day 3: Evaluation script
 - Day 4: Model-card notes
 
-### Azmat (Classification/Risk/Integration)
+### Sandeep (FastAPI)
+- Day 1: FastAPI app structure and router setup
+- Day 2: Upload/analyze endpoint implementation
+- Day 3: Search endpoint and schema validation
+- Day 4: API docs and integration checks
+
+### Azmat (Classification/Risk)
 - Day 1: Clause classifier baseline
 - Day 2: Risk scoring logic
-- Day 3: API contract analysis endpoint integration
+- Day 3: Classifier and risk calibration updates
 - Day 4: End-to-end integration tests
