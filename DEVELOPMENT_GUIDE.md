@@ -19,9 +19,18 @@ git checkout -b develop
 git checkout -b feature/dataset-cleaning
 git checkout -b feature/ocr-pipeline
 git checkout -b feature/ner-extraction
+git checkout -b feature/fastapi-backend
 git checkout -b feature/clause-risk-scoring
 git checkout -b feature/integration-testing
 ```
+
+## Team Ownership
+
+- Ahmad -> Dataset Cleaning
+- Sahasra -> OCR Pipeline
+- Sandeep -> NER Extraction
+- Azmat -> FastAPI Backend
+- Azmat -> Clause Classification, Risk Scoring and Integration
 
 ## Milestones
 
