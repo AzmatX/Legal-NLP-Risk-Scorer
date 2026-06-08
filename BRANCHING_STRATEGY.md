@@ -7,7 +7,7 @@
 
 ## Feature Branches and Ownership
 
-- `feature/dataset-cleaning` — Lakshya
+- `feature/dataset-cleaning` — Lakshay
 - `feature/ocr-pipeline` — Ahmad
 - `feature/ner-extraction` — Sahasra
 - `feature/fastapi-backend` — Sandeep
