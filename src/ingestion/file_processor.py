@@ -1,6 +1,7 @@
 from src.ingestion.cleaner import TextCleaner
 from src.ingestion.schema import ContractSchema
 
+
 class ContractProcessor:
 
     def __init__(self):
