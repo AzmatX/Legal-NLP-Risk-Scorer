@@ -46,7 +46,7 @@ docker compose up --build
 - `develop` → Integration branch for all completed features
 
 ### Feature Branches
-- `feature/dataset-cleaning` → Lakshya
+- `feature/dataset-cleaning` → Lakshay
 - `feature/ocr-pipeline` → Ahmad
 - `feature/ner-extraction` → Sahasra
 - `feature/fastapi-backend` → Sandeep
@@ -72,7 +72,7 @@ feature/* → develop → main
 
 | Member | Module |
 |--------|--------|
-| Lakshya | Dataset & Cleaning |
+| Lakshay | Dataset & Cleaning |
 | Ahmad | OCR Pipeline |
 | Sahasra | NER Extraction |
 | Sandeep | FastAPI Backend |
