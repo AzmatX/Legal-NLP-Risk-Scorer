@@ -29,5 +29,35 @@ for img_path in glob.glob("*.png") + glob.glob("*.jpg"):
     
     print("\n--- FINAL CORRECTED TEXT ---")
     print(final_text)
-    print("----------------------------")
+    
+    # --- STEP 3: RISK SCORING SYSTEM ---
+    # Risk waale shabdo ki list aur unke points
+    risk_keywords = {
+        "termination": 20,
+        "penalty": 15,
+        "breach": 25,
+        "liability": 20,
+        "damage": 10
+    }
+    
+    total_risk_score = 0
+    found_risks = []
+    
+    # Text ko lowercase mein badlo taaki scanning sahi se ho
+    text_lower = final_text.lower()
+    
+    # Shabdo ko scan karo
+    for word, score in risk_keywords.items():
+        if word in text_lower:
+            total_risk_score += score
+            found_risks.append(f"{word.upper()} (+{score})")
+            
+    # Risk Report Print Karo
+    print("\n📊 --- RISK SCORING REPORT ---")
+    print(f"Total Risk Score: {total_risk_score}/100")
+    if found_risks:
+        print(f"Risk Factors Found: {', '.join(found_risks)}")
+    else:
+        print("✅ No major risk keywords detected.")
+    print("==================================")
     
