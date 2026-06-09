@@ -73,7 +73,7 @@ feature/* → develop → main
 | Member | Module |
 |--------|--------|
 | Lakshay | Dataset & Cleaning |
-| Ahmad | OCR Pipeline |
+| Ahmad | OCR Pipeline + Risk Scoring|
 | Sahasra | NER Extraction |
 | Sandeep | FastAPI Backend |
-| Azmat | Clause Classification + Risk Scoring + Integration |
+| Azmat | Clause Classification + Integration |
