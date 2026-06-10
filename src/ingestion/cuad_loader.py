@@ -5,7 +5,7 @@ class CUADLoader:
 
     def load(self, file_path: str):
 
-        with open(file_path, "r", encoding="utf-8") as file:
+        with open(file_path, encoding="utf-8") as file:
             data = json.load(file)
 
         contracts = []
