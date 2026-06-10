@@ -3,7 +3,7 @@ name: FastAPI Backend
 about: FastAPI contract intelligence endpoints
 title: "[API] FastAPI contract intelligence endpoints"
 labels: [api, backend]
-assignees: [Azmat]
+assignees: [Sandeep]
 ---
 
 ## Description

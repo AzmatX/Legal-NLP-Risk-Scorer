@@ -7,10 +7,10 @@
 
 ## Feature Branches and Ownership
 
-- `feature/dataset-cleaning` — Ahmad
-- `feature/ocr-pipeline` — Sahasra
-- `feature/ner-extraction` — Sandeep
-- `feature/fastapi-backend` — Azmat
+- `feature/dataset-cleaning` — Lakshay
+- `feature/ocr-pipeline` — Ahmad
+- `feature/ner-extraction` — Sahasra
+- `feature/fastapi-backend` — Sandeep
 - `feature/clause-risk-scoring` — Azmat
 - `feature/integration-testing` — Azmat
 

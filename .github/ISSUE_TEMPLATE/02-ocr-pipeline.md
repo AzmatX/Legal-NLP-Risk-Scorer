@@ -3,7 +3,7 @@ name: OCR Pipeline
 about: OCR pipeline for PDF/DOCX contract extraction
 title: "[OCR] OCR pipeline for PDF/DOCX contract extraction"
 labels: [ocr, ml]
-assignees: [Sahasra]
+assignees: [Ahmad]
 ---
 
 ## Description

@@ -41,19 +41,39 @@ docker compose up --build
 
 ## Branch Strategy
 
-- `main`
-- `develop`
-- `feature/dataset-cleaning`
-- `feature/ocr-pipeline`
-- `feature/ner-extraction`
-- `feature/clause-risk-scoring`
-- `feature/integration-testing`
+### Main Branches
+- `main` → Production-ready stable code
+- `develop` → Integration branch for all completed features
+
+### Feature Branches
+- `feature/dataset-cleaning` → Lakshay
+- `feature/ocr-pipeline` → Ahmad
+- `feature/ner-extraction` → Sahasra
+- `feature/fastapi-backend` → Sandeep
+- `feature/clause-risk-scoring` → Azmat
+- `feature/integration-testing` → System integration and final testing
+
+### Merge Flow
+
+feature/* → develop → main
+
+### Workflow Rules
+
+1. No direct commits to `main`.
+2. All development must occur on feature branches.
+3. Feature branches are merged into `develop` via Pull Requests.
+4. Integration testing is performed on `develop`.
+5. Only tested and approved code is merged from `develop` to `main`.
+6. Every team member must push commits daily with meaningful commit messages.
 
 > Branch creation is documented in `DEVELOPMENT_GUIDE.md` for manual execution.
 
 ## Team Ownership
 
-- **Ahmad** — Dataset Processing & Cleaning
-- **Sahasra** — OCR Pipeline
-- **Sandeep** — NER Extraction
-- **Azmat** — Clause Classification, Risk Scoring, Integration
+| Member | Module |
+|--------|--------|
+| Lakshay | Dataset & Cleaning |
+| Ahmad | OCR Pipeline + Risk Scoring|
+| Sahasra | NER Extraction |
+| Sandeep | FastAPI Backend |
+| Azmat | Clause Classification + Integration |
