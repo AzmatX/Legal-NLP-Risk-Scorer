@@ -1,8 +1,9 @@
 import glob
+
 import cv2
 import pytesseract
-from PIL import Image
 from autocorrect import Speller
+from PIL import Image
 from pypdf import PdfReader
 
 # 1. Tesseract Windows Path
