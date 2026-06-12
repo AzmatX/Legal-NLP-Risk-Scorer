@@ -72,7 +72,7 @@ feature/* → develop → main
 
 | Member | Module |
 |--------|--------|
-| Lakshay | Dataset & Cleaning |
+| Lakshay | Dataset + Cleaning |
 | Ahmad | OCR Pipeline + Risk Scoring|
 | Sahasra | NER Extraction |
 | Sandeep | FastAPI Backend |
