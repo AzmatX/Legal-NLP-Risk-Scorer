@@ -33,7 +33,7 @@ ruff check .
 uvicorn api.main:app --app-dir src --host 0.0.0.0 --port 8000
 ```
 
-## Docker
+## Docked
 
 ```bash
 docker compose up --build
