@@ -15,7 +15,7 @@ Production-ready starter repository for an enterprise NLP platform that ingests 
 
 ## Tech Stack
 
-- Python 3.11
+- Python 3.11 ## 
 - FastAPI + Uvicorn
 - Celery
 - PyTorch / Transformers / spaCy (optional ML extras)
