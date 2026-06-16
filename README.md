@@ -76,4 +76,4 @@ feature/* → develop → main
 | Ahmad Malik | OCR Pipeline + Risk Scoring|
 | Sahasra | NER Extraction |
 | Sandeep | FastAPI Backend |
-| Azmat | Clause Classification + Integration |
+| Azmat Ahmad | Clause Classification + Integration |
