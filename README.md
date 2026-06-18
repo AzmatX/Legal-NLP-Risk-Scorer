@@ -75,5 +75,5 @@ feature/* → develop → main
 | Lakshay Kundaeiya | Dataset and also Cleaning |
 | Ahmad Malik | OCR Pipeline + Risk Scoring|
 | Sahasra | NER Extraction |
-| Sandeep | FastAPI Backend |
+| Sandeep sing | FastAPI Backend |
 | Azmat Ahmad | Clause Classification + Integration |
