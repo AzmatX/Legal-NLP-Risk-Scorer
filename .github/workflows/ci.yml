@@ -23,4 +23,4 @@ jobs:
       - name: Ruff
         run: ruff check .
       - name: Pytest
-        run: pytest -q
+        run: python -m pytest -q
