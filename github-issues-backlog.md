@@ -24,28 +24,28 @@ Use this backlog to create GitHub issues manually.
 - **Title:** Dataset Parsing with CUAD ingestion pipeline
 - **Description:** Build CUAD parser, schema validation, and cleaned dataset export.
 - **Labels:** `dataset`, `backend`
-- **Assignee:** Ahmad
+- **Assignee:** Lakshya
 - **Milestone:** Week 1
 
 ### 2) OCR Pipeline
 - **Title:** OCR pipeline for PDF/DOCX contract extraction
 - **Description:** Implement OCR abstraction and adapters for scanned contracts.
 - **Labels:** `ocr`, `ml`
-- **Assignee:** Sahasra
+- **Assignee:** Ahmad
 - **Milestone:** Week 1
 
 ### 3) NER Extraction
 - **Title:** Legal entity recognition module
 - **Description:** Implement named entity extraction for legal parties and obligations.
 - **Labels:** `ner`, `ml`
-- **Assignee:** Sandeep
+- **Assignee:** Sahasra
 - **Milestone:** Week 2
 
 ### 4) Clause Classification
 - **Title:** Clause classification baseline with Legal-RoBERTa
 - **Description:** Build clause classifier service and baseline training/eval pipeline.
 - **Labels:** `classification`, `ml`
-- **Assignee:** Azmat
+- **Assignee:** Sandeep
 - **Milestone:** Week 2
 
 ### 5) Risk Scoring
@@ -94,5 +94,5 @@ Use this backlog to create GitHub issues manually.
 
 ```bash
 # Example issue creation
-# gh issue create --title "Dataset Parsing with CUAD ingestion pipeline" --body "..." --label dataset --assignee Ahmad --milestone "Week 1"
+# gh issue create --title "Dataset Parsing with CUAD ingestion pipeline" --body "..." --label dataset --assignee Lakshya --milestone "Week 1"
 ```

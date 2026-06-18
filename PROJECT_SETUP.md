@@ -42,11 +42,11 @@ Assign each issue from `github-issues-backlog.md` to one milestone.
 
 ## Branch Ownership
 
-- Ahmad -> Dataset Cleaning (`feature/dataset-cleaning`)
-- Sahasra -> OCR Pipeline (`feature/ocr-pipeline`)
-- Sandeep -> NER Extraction (`feature/ner-extraction`)
-- Azmat -> FastAPI Backend (`feature/fastapi-backend`)
-- Azmat -> Clause Classification, Risk Scoring and Integration (`feature/clause-risk-scoring`, `feature/integration-testing`)
+- Lakshya -> Dataset & Cleaning (`feature/dataset-cleaning`)
+- Ahmad -> OCR Pipeline (`feature/ocr-pipeline`)
+- Sahasra -> NER Extraction (`feature/ner-extraction`)
+- Sandeep -> FastAPI Backend (`feature/fastapi-backend`)
+- Azmat -> Clause Classification & Risk Scoring (`feature/clause-risk-scoring`, `feature/integration-testing`)
 
 ## Daily Commit Policy
 

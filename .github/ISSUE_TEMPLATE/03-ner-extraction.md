@@ -3,7 +3,7 @@ name: NER Extraction
 about: Legal entity recognition module
 title: "[NER] Legal entity recognition module"
 labels: [ner, ml]
-assignees: [Sandeep]
+assignees: [Sahasra]
 ---
 
 ## Description

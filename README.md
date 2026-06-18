@@ -34,7 +34,7 @@ ruff check .
 uvicorn api.main:app --app-dir src --host 0.0.0.0 --port 8000
 ```
 
-## Docker
+## Docked
 
 ```bash
 docker compose up --build
@@ -69,6 +69,30 @@ This repository follows a collaborative development model. All contributors are 
 See `DEVELOPMENT_GUIDE.md` for detailed branching workflow.
 
 ## Documentation
+### Main Branches
+- `main` → Production-ready stable code
+- `develop` → Integration branch for all completed features
+
+### Feature Branches
+- `feature/dataset-cleaning` → Lakshay
+- `feature/ocr-pipeline` → Ahmad
+- `feature/ner-extraction` → Sahasra
+- `feature/fastapi-backend` → Sandeep
+- `feature/clause-risk-scoring` → Azmat
+- `feature/integration-testing` → System integration and final testing
+
+### Merge Flow
+
+feature/* → develop → main
+
+### Workflow Rules
+
+1. No direct commits to `main`.
+2. All development must occur on feature branches.
+3. Feature branches are merged into `develop` via Pull Requests.
+4. Integration testing is performed on `develop`.
+5. Only tested and approved code is merged from `develop` to `main`.
+6. Every team member must push commits daily with meaningful commit messages.
 
 - [Development Guide](DEVELOPMENT_GUIDE.md) — Build, test, and deployment procedures
 - [Contributing Guidelines](CONTRIBUTING.md) — How to contribute to this project
@@ -79,3 +103,10 @@ See `DEVELOPMENT_GUIDE.md` for detailed branching workflow.
 ## License
 
 Proprietary — All rights reserved.
+| Member | Module |
+|--------|--------|
+| Lakshay Kundaeiya | Dataset and also Cleaning |
+| Ahmad Malik | OCR Pipeline + Risk Scoring|
+| Sahasra | NER Extraction |
+| Sandeep Singh | FastAPI Backend |
+| Azmat Ahmad | Clause Classification + Integration |
