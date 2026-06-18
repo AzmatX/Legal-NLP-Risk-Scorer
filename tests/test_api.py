@@ -14,6 +14,6 @@ def test_health_endpoint() -> None:
 def test_analyze_rejects_invalid_extension() -> None:
     response = client.post(
         "/contracts/analyze",
-        files={"file": ("contract.txt", b"invalid", "text/plain")},
+        files={"file": ("contract.xml", b"invalid", "application/xml")},
     )
     assert response.status_code == 400
