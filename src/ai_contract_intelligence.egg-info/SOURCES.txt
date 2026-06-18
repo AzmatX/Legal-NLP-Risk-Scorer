@@ -25,3 +25,4 @@ src/utils/config.py
 src/vector_store/__init__.py
 src/vector_store/service.py
 tests/test_api.py
+tests/test_ingestion.py

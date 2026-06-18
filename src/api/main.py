@@ -23,7 +23,8 @@ async def analyze_contract(file: UploadFile = File(...)) -> dict[str, object]:
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     payload = await file.read()
-    text = extract_text_from_document(payload)
+    text_result = extract_text_from_document(payload, is_file_path=False)
+    text = text_result.get("full_text", "") if isinstance(text_result, dict) else text_result
     entities = extract_legal_entities(text)
     clause = classify_clause(text)
     risk = score_contract([clause])
