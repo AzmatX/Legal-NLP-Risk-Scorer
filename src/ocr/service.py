@@ -8,13 +8,12 @@ and pdf2image for processing scanned legal documents and contract images.
 import io
 import logging
 from pathlib import Path
-from typing import Dict, List, Optional, Union
 
 logger = logging.getLogger(__name__)
 
 try:
-    from pdf2image import convert_from_bytes, convert_from_path
     import pytesseract
+    from pdf2image import convert_from_bytes
     PYTESSERACT_AVAILABLE = True
     logger.info("Tesseract OCR and pdf2image successfully loaded")
 except ImportError as e:
@@ -23,10 +22,10 @@ except ImportError as e:
 
 
 def extract_text_from_document(
-    file_source: Union[str, bytes, Path], 
+    file_source: str | bytes | Path, 
     is_file_path: bool = True,
     dpi: int = 300
-) -> Dict[str, Union[str, List[str], int]]:
+) -> dict[str, str | list[str] | int]:
     """
     Extract text from PDF documents using OCR.
     
@@ -75,7 +74,10 @@ def extract_text_from_document(
         if not PYTESSERACT_AVAILABLE:
             # Graceful fallback when OCR libraries not available
             logger.warning("OCR libraries not available, returning placeholder")
-            result['full_text'] = "OCR_NOT_AVAILABLE: Install pdf2image and pytesseract for full OCR functionality"
+            result['full_text'] = (
+                "OCR_NOT_AVAILABLE: Install pdf2image and pytesseract "
+                "for full OCR functionality"
+            )
             result['success'] = True  # Still mark as success since we handled it gracefully
             return result
         
@@ -110,7 +112,7 @@ def extract_text_from_document(
 
 
 def extract_text_from_image(
-    image_source: Union[str, bytes, Path],
+    image_source: str | bytes | Path,
     lang: str = "eng",
     is_file_path: bool = True
 ) -> str:
@@ -162,10 +164,10 @@ def extract_text_from_image(
 
 
 def extract_text_with_confidence(
-    file_source: Union[str, bytes, Path],
+    file_source: str | bytes | Path,
     is_file_path: bool = True,
     lang: str = "eng"
-) -> Dict[str, Union[str, float, List[Dict]]]:
+) -> dict[str, str | float | list[dict]]:
     """
     Extract text with confidence scores for each word/token.
     
@@ -233,9 +235,9 @@ def extract_text_with_confidence(
 
 
 def batch_process_documents(
-    file_paths: List[Union[str, Path]],
-    output_dir: Optional[str] = None
-) -> Dict[str, Union[int, List[Dict]]]:
+    file_paths: list[str | Path],
+    output_dir: str | None = None
+) -> dict[str, int | list[dict]]:
     """
     Process multiple documents in batch.
     
@@ -283,7 +285,10 @@ def batch_process_documents(
             results['total_failed'] += 1
             logger.error(f"Failed to process {file_path}: {e}")
     
-    logger.info(f"Batch processing complete: {results['total_processed']} succeeded, {results['total_failed']} failed")
+    logger.info(
+        f"Batch processing complete: {results['total_processed']} succeeded, "
+        f"{results['total_failed']} failed"
+    )
     return results
 
 
