@@ -6,13 +6,12 @@ monetary values, parties, and other legally significant entities from contract t
 """
 
 import logging
-from typing import List, Dict, Any, Optional, Set
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
 try:
     import spacy
-    from spacy.tokens import Doc
     SPACY_AVAILABLE = True
     logger.info("spaCy successfully loaded for NER processing")
 except ImportError as e:
@@ -110,9 +109,9 @@ class NERProcessor:
     def extract_entities(
         self, 
         text: str, 
-        entity_types: Optional[Set[str]] = None,
+        entity_types: set[str] | None = None,
         include_metadata: bool = True
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """
         Extract legal entities from text.
         
@@ -170,8 +169,8 @@ class NERProcessor:
     def _fallback_extraction(
         self, 
         text: str, 
-        entity_types: Optional[Set[str]] = None
-    ) -> List[Dict[str, Any]]:
+        entity_types: set[str] | None = None
+    ) -> list[dict[str, Any]]:
         """
         Fallback entity extraction when spaCy is unavailable.
         
@@ -213,7 +212,7 @@ class NERProcessor:
         self, 
         text: str, 
         entity_type: str
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """
         Extract entities of a specific type.
         
@@ -226,7 +225,7 @@ class NERProcessor:
         """
         return self.extract_entities(text, entity_types={entity_type})
     
-    def extract_parties(self, text: str) -> List[Dict[str, Any]]:
+    def extract_parties(self, text: str) -> list[dict[str, Any]]:
         """
         Extract contract parties from text.
         
@@ -238,7 +237,7 @@ class NERProcessor:
         """
         return self.extract_by_type(text, "PERSON")
     
-    def extract_dates(self, text: str) -> List[Dict[str, Any]]:
+    def extract_dates(self, text: str) -> list[dict[str, Any]]:
         """
         Extract date entities from text.
         
@@ -250,7 +249,7 @@ class NERProcessor:
         """
         return self.extract_by_type(text, "DATE")
     
-    def extract_monetary_values(self, text: str) -> List[Dict[str, Any]]:
+    def extract_monetary_values(self, text: str) -> list[dict[str, Any]]:
         """
         Extract monetary values from text.
         
@@ -266,7 +265,7 @@ class NERProcessor:
         self, 
         text: str,
         deduplicate: bool = True
-    ) -> Dict[str, List[str]]:
+    ) -> dict[str, list[str]]:
         """
         Get a summary of entities grouped by type.
         
@@ -297,9 +296,9 @@ class NERProcessor:
     
     def process_batch(
         self, 
-        texts: List[str],
-        entity_types: Optional[Set[str]] = None
-    ) -> List[List[Dict[str, Any]]]:
+        texts: list[str],
+        entity_types: set[str] | None = None
+    ) -> list[list[dict[str, Any]]]:
         """
         Process multiple texts in batch.
         
@@ -324,7 +323,7 @@ class NERProcessor:
 
 
 # Legacy function wrappers for backward compatibility
-_default_processor: Optional[NERProcessor] = None
+_default_processor: NERProcessor | None = None
 
 
 def _get_default_processor() -> NERProcessor:
@@ -335,7 +334,7 @@ def _get_default_processor() -> NERProcessor:
     return _default_processor
 
 
-def extract_legal_entities(text: str) -> List[Dict[str, Any]]:
+def extract_legal_entities(text: str) -> list[dict[str, Any]]:
     """
     Extract legal entities from text using spaCy NER.
     
@@ -354,7 +353,7 @@ def extract_legal_entities(text: str) -> List[Dict[str, Any]]:
     return processor.extract_entities(text)
 
 
-def extract_entities_by_type(text: str, entity_types: List[str]) -> List[Dict[str, Any]]:
+def extract_entities_by_type(text: str, entity_types: list[str]) -> list[dict[str, Any]]:
     """
     Extract only specific entity types from text.
     
@@ -369,7 +368,7 @@ def extract_entities_by_type(text: str, entity_types: List[str]) -> List[Dict[st
     return processor.extract_entities(text, entity_types=set(entity_types))
 
 
-def get_entity_summary(text: str) -> Dict[str, List[str]]:
+def get_entity_summary(text: str) -> dict[str, list[str]]:
     """
     Get a summary of entities grouped by type.
     
