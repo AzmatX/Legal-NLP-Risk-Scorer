@@ -10,7 +10,12 @@ src/api/main.py
 src/clause_classifier/__init__.py
 src/clause_classifier/service.py
 src/ingestion/__init__.py
+src/ingestion/cleaner.py
+src/ingestion/cuad_loader.py
+src/ingestion/file_processor.py
+src/ingestion/schema.py
 src/ingestion/service.py
+src/ingestion/validator.py
 src/ner/__init__.py
 src/ner/service.py
 src/ocr/__init__.py
