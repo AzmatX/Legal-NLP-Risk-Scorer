@@ -1,9 +1,57 @@
-```
-# Compressed files
-*.patch
-*.tar.gz
+```gitignore
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
 
-# Logs and temp files
+# Python package metadata
+*.egg-info/
+
+# Logs
 *.log
+
+# Environment variables
+.env
+.env.local
+*.env.*
+
+# IDE specific files
+.vscode/
+.idea/
+*.swp
+*.swo
 *.tmp
+
+# Coverage reports
+coverage/
+htmlcov/
+.coverage
+
+# Python virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Build artifacts
+build/
+dist/
+*.egg
+*.whl
+*.pyc
+*.pyo
+*.pyd
+*.so
+*.dylib
+*.dll
+
+# Testing
+.pytest_cache/
+.mypy_cache/
+.hypothesis/
+
+# OS generated files
+.DS_Store
+Thumbs.db
 ```
