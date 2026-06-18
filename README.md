@@ -5,21 +5,22 @@ Production-ready starter repository for an enterprise NLP platform that ingests 
 ## Core Capabilities
 
 - Upload PDF/DOCX contracts
-- OCR extraction pipeline scaffold
-- Legal entity extraction scaffold
-- Clause classification scaffold
-- Risk scoring scaffold
-- Semantic search scaffold
-- FastAPI APIs
-- Celery task worker setup
+- OCR extraction pipeline with Tesseract/pdf2image
+- Legal entity extraction using spaCy NER
+- Clause classification with transformer models
+- Risk scoring engine
+- Semantic search with vector embeddings
+- FastAPI REST APIs
+- Celery distributed task worker
 
 ## Tech Stack
 
-- Python 3.11 ## 
+- Python 3.11+
 - FastAPI + Uvicorn
-- Celery
-- PyTorch / Transformers / spaCy (optional ML extras)
-- LangChain (optional vector extras)
+- Celery + Redis
+- PyTorch / Transformers / spaCy
+- LangChain for RAG pipelines
+- Tesseract OCR + pdf2image
 - Docker + Docker Compose
 
 ## Quickstart
@@ -39,8 +40,35 @@ uvicorn api.main:app --app-dir src --host 0.0.0.0 --port 8000
 docker compose up --build
 ```
 
+## Project Status
+
+| Module | Status | Description |
+|--------|--------|-------------|
+| Dataset Ingestion | ✅ Complete | CUAD dataset loading, format conversion, tokenization, train/val/test splits |
+| OCR Pipeline | ✅ Complete | PDF/image text extraction with Tesseract, confidence scoring, batch processing |
+| NER Engine | ✅ Complete | spaCy-based entity extraction for 18 legal entity types |
+| Clause Classifier | 🚧 In Progress | Transformer-based clause classification (RoBERTa-legal) |
+| Risk Scoring | 📋 Planned | Clause-level and document-level risk assessment |
+| API Layer | 🚧 In Progress | REST endpoints for all core services |
+
+## Repository Maintenance
+
+This repository follows a collaborative development model. All contributors are acknowledged in the commit history. For contribution guidelines, see `CONTRIBUTING.md`.
+
+### Recent Development Milestones
+
+- **Week 1**: Dataset ingestion pipeline, OCR enhancement, NER processor implementation
+- **Week 2**: Clause classifier fine-tuning, evaluation metrics, post-processing heuristics
+
 ## Branch Strategy
 
+- `main` — Production releases
+- `develop` — Integration branch for features
+- `feature/*` — Feature branches for active development
+
+See `DEVELOPMENT_GUIDE.md` for detailed branching workflow.
+
+## Documentation
 ### Main Branches
 - `main` → Production-ready stable code
 - `develop` → Integration branch for all completed features
@@ -66,10 +94,15 @@ feature/* → develop → main
 5. Only tested and approved code is merged from `develop` to `main`.
 6. Every team member must push commits daily with meaningful commit messages.
 
-> Branch creation is documented in `DEVELOPMENT_GUIDE.md` for manual execution.
+- [Development Guide](DEVELOPMENT_GUIDE.md) — Build, test, and deployment procedures
+- [Contributing Guidelines](CONTRIBUTING.md) — How to contribute to this project
+- [Code of Conduct](CODE_OF_CONDUCT.md) — Community standards
+- [Project Setup](PROJECT_SETUP.md) — Environment configuration
+- [Branching Strategy](BRANCHING_STRATEGY.md) — Git workflow
 
-## Team Ownership
+## License
 
+Proprietary — All rights reserved.
 | Member | Module |
 |--------|--------|
 | Lakshay Kundaeiya | Dataset and also Cleaning |
