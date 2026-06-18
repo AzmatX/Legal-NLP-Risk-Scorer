@@ -3,9 +3,8 @@ Clause Classification Service
 Fine-tuned transformer models for classifying legal clauses
 Supports RoBERTa-legal and other pre-trained legal language models
 """
-from typing import Dict, Any, List
 import re
-
+from typing import Any
 
 # Legal clause types commonly found in contracts (CUAD dataset categories)
 LEGAL_CLAUSE_TYPES = [
@@ -58,7 +57,7 @@ class ClauseClassifier:
         
         # Try to load transformers
         try:
-            from transformers import AutoTokenizer, AutoModelForSequenceClassification
+            from transformers import AutoModelForSequenceClassification, AutoTokenizer
             self.AutoTokenizer = AutoTokenizer
             self.AutoModelForSequenceClassification = AutoModelForSequenceClassification
             self.TRANSFORMERS_AVAILABLE = True
@@ -88,7 +87,7 @@ class ClauseClassifier:
         except Exception:
             self._model_loaded = False
     
-    def classify_clause(self, text: str) -> Dict[str, Any]:
+    def classify_clause(self, text: str) -> dict[str, Any]:
         """
         Classify a legal clause into one of the predefined categories.
         
@@ -142,7 +141,7 @@ class ClauseClassifier:
         except Exception:
             return self._heuristic_classify(text)
     
-    def _heuristic_classify(self, text: str) -> Dict[str, Any]:
+    def _heuristic_classify(self, text: str) -> dict[str, Any]:
         """
         Fallback heuristic-based classification using keyword matching.
         
@@ -164,9 +163,13 @@ class ClauseClassifier:
             "termination_for_cause": r"terminate.*cause|breach|default|violation",
             "non_compete": r"non-compete|competing business|competitive activity",
             "non_solicit": r"non-solicit|solicit employees|solicit customers",
-            "intellectual_property_assignment": r"intellectual property|IP rights|work product|inventions",
+            "intellectual_property_assignment": (
+                r"intellectual property|IP rights|work product|inventions"
+            ),
             "confidentiality": r"confidential|non-disclosure|proprietary information",
-            "limitation_of_liability": r"limitation of liability|consequential damages|indirect damages",
+            "limitation_of_liability": (
+                r"limitation of liability|consequential damages|indirect damages"
+            ),
             "indemnification": r"indemnif[y|ication]|hold harmless|defend against",
             "insurance": r"insurance|coverage|policy|insured",
             "warranty": r"warranty|representations|warrant",
@@ -203,7 +206,7 @@ class ClauseClassifier:
         
         return {"label": "other", "confidence": "0.50"}
     
-    def classify_multiple_clauses(self, clauses: List[str]) -> List[Dict[str, Any]]:
+    def classify_multiple_clauses(self, clauses: list[str]) -> list[dict[str, Any]]:
         """
         Classify multiple clauses at once.
         
@@ -217,7 +220,7 @@ class ClauseClassifier:
 
 
 # Convenience function for backward compatibility
-def classify_clause(text: str) -> Dict[str, str]:
+def classify_clause(text: str) -> dict[str, str]:
     """
     Classify a legal clause (convenience function).
     
