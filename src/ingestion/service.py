@@ -8,9 +8,7 @@ including CUAD format conversion and tokenization preparation.
 import json
 import logging
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
-
-from pathlib import Path
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -21,10 +19,13 @@ def validate_contract_file(file_name: str) -> None:
     """Validate that the file type is supported for ingestion."""
     suffix = Path(file_name).suffix.lower()
     if suffix not in ALLOWED_SUFFIXES:
-        raise ValueError(f"Unsupported file type: {suffix}. Only PDF, DOCX, JSON, and TXT files are supported")
+        raise ValueError(
+            f"Unsupported file type: {suffix}. "
+            "Only PDF, DOCX, JSON, and TXT files are supported"
+        )
 
 
-def load_cuad_dataset(dataset_path: str) -> List[Dict[str, Any]]:
+def load_cuad_dataset(dataset_path: str) -> list[dict[str, Any]]:
     """
     Load CUAD dataset from JSON format.
     
@@ -40,7 +41,7 @@ def load_cuad_dataset(dataset_path: str) -> List[Dict[str, Any]]:
     
     logger.info(f"Loading CUAD dataset from {dataset_path}")
     
-    with open(path, 'r', encoding='utf-8') as f:
+    with open(path, encoding='utf-8') as f:
         data = json.load(f)
     
     # Handle both CUAD v1 and v2 formats
@@ -61,10 +62,10 @@ def load_cuad_dataset(dataset_path: str) -> List[Dict[str, Any]]:
 
 
 def convert_cuad_to_training_format(
-    contracts: List[Dict[str, Any]], 
+    contracts: list[dict[str, Any]], 
     output_dir: str,
     include_annotations: bool = True
-) -> Tuple[int, int]:
+) -> tuple[int, int]:
     """
     Convert CUAD dataset to training-ready JSON format.
     
@@ -113,7 +114,7 @@ def convert_cuad_to_training_format(
     return successful, failed
 
 
-def tokenize_text_for_ner(text: str, max_length: int = 512) -> List[Dict[str, Any]]:
+def tokenize_text_for_ner(text: str, max_length: int = 512) -> list[dict[str, Any]]:
     """
     Tokenize text into sentences/chunks suitable for NER model input.
     
@@ -168,7 +169,7 @@ def create_training_splits(
     val_ratio: float = 0.1,
     test_ratio: float = 0.1,
     seed: int = 42
-) -> Dict[str, int]:
+) -> dict[str, int]:
     """
     Create train/val/test splits from processed dataset.
     
@@ -222,11 +223,14 @@ def create_training_splits(
         'test': len(test_files)
     }
     
-    logger.info(f"Created splits: Train={counts['train']}, Val={counts['val']}, Test={counts['test']}")
+    logger.info(
+        f"Created splits: Train={counts['train']}, "
+        f"Val={counts['val']}, Test={counts['test']}"
+    )
     return counts
 
 
-def ingest_document(file_path: str) -> Dict[str, Any]:
+def ingest_document(file_path: str) -> dict[str, Any]:
     """
     Main entry point for ingesting a single document.
     
@@ -237,22 +241,28 @@ def ingest_document(file_path: str) -> Dict[str, Any]:
         Processed document with metadata
     """
     path = Path(file_path)
-    validate_contract_file(file_path)
     
     result = {
         'file_path': str(path),
         'file_name': path.name,
-        'file_size': path.stat().st_size,
         'processed': False,
         'error': None
     }
     
+    # Check if file exists first
+    if not path.exists():
+        result['error'] = f"File not found: {file_path}"
+        return result
+    
     try:
+        validate_contract_file(file_path)
+        result['file_size'] = path.stat().st_size
+        
         if path.suffix.lower() == '.json':
-            with open(path, 'r', encoding='utf-8') as f:
+            with open(path, encoding='utf-8') as f:
                 result['content'] = json.load(f)
         elif path.suffix.lower() == '.txt':
-            with open(path, 'r', encoding='utf-8') as f:
+            with open(path, encoding='utf-8') as f:
                 result['content'] = {'text': f.read()}
         # PDF and DOCX handled by OCR pipeline
         else:

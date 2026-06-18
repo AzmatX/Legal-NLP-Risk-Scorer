@@ -6,19 +6,16 @@ and training split creation.
 """
 
 import json
-import os
-import tempfile
-from pathlib import Path
 
 import pytest
 
 from src.ingestion.service import (
-    validate_contract_file,
-    load_cuad_dataset,
     convert_cuad_to_training_format,
-    tokenize_text_for_ner,
     create_training_splits,
-    ingest_document
+    ingest_document,
+    load_cuad_dataset,
+    tokenize_text_for_ner,
+    validate_contract_file,
 )
 
 
