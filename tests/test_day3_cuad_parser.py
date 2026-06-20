@@ -1,8 +1,8 @@
+from pathlib import Path
+
 from src.ingestion.cuad_loader import CUADLoader
 
 loader = CUADLoader()
-
-from pathlib import Path
 
 dataset_path = Path("data/CUADv1.json")
 
