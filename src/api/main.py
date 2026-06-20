@@ -1,12 +1,12 @@
 from fastapi import FastAPI, File, HTTPException, UploadFile
 
-from clause_classifier.service import classify_clause
-from ingestion.service import validate_contract_file
-from ner.service import extract_legal_entities
-from ocr.service import extract_text_from_document
-from risk_scoring.service import score_contract
-from utils.config import settings
-from vector_store.service import semantic_search
+from src.clause_classifier.service import classify_clause
+from src.ingestion.service import validate_contract_file
+from src.ner.service import extract_legal_entities
+from src.ocr.service import extract_text_from_document
+from src.risk_scoring.service import score_contract
+from src.utils.config import settings
+from src.vector_store.service import semantic_search
 
 app = FastAPI(title=settings.app_name, version=settings.app_version)
 

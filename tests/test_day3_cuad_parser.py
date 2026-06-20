@@ -2,7 +2,9 @@ from src.ingestion.cuad_loader import CUADLoader
 
 loader = CUADLoader()
 
-dataset_path = r"C:\Users\Admin\Desktop\ZAALIMA TEAM\CUAD DATASET\cuad-main\data\CUADv1.json"
+from pathlib import Path
+
+dataset_path = Path("data/CUADv1.json")
 
 contracts = loader.load(dataset_path)
 
