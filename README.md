@@ -1,112 +1,111 @@
-# AI-Powered Contract Intelligence & Risk Scoring System
+# Contributing Guidelines
 
-Production-ready starter repository for an enterprise NLP platform that ingests legal contracts, extracts intelligence, and serves risk analysis through APIs.
+Thank you for your interest in contributing to the AI-Powered Contract Intelligence & Risk Scoring System.
 
-## Core Capabilities
+This project follows a structured development workflow to ensure code quality, maintainability, and reproducibility.
 
-- Upload PDF/DOCX contracts
-- OCR extraction pipeline with Tesseract/pdf2image
-- Legal entity extraction using spaCy NER
-- Clause classification with transformer models
-- Risk scoring engine
-- Semantic search with vector embeddings
-- FastAPI REST APIs
-- Celery distributed task worker
+## Development Workflow
 
-## Tech Stack
+### Branch Strategy
 
-- Python 3.11+
-- FastAPI + Uvicorn
-- Celery + Redis
-- PyTorch / Transformers / spaCy
-- LangChain for RAG pipelines
-- Tesseract OCR + pdf2image
-- Docker + Docker Compose
+* `main` → Stable production branch
+* `develop` → Active development branch
+* `feature/*` → Individual feature development
 
-## Quickstart
+Examples:
+
+```text
+feature/ocr-pipeline
+feature/ner-engine
+feature/risk-scoring
+feature/api-backend
+```
+
+Direct commits to `main` are not permitted.
+
+---
+
+## Getting Started
+
+Clone the repository:
+
+```bash
+git clone <repository-url>
+cd contract-intelligence-platform
+```
+
+Create a virtual environment:
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-pip install -e .[dev]
-pytest -q
-ruff check .
-uvicorn api.main:app --app-dir src --host 0.0.0.0 --port 8000
 ```
 
-## Docked
+Install dependencies:
 
 ```bash
-docker compose up --build
+pip install -r requirements.txt
 ```
 
-## Project Status
+---
 
-| Module | Status | Description |
-|--------|--------|-------------|
-| Dataset Ingestion | ✅ Complete | CUAD dataset loading, format conversion, tokenization, train/val/test splits |
-| OCR Pipeline | ✅ Complete | PDF/image text extraction with Tesseract, confidence scoring, batch processing |
-| NER Engine | ✅ Complete | spaCy-based entity extraction for 18 legal entity types |
-| Clause Classifier | 🚧 In Progress | Transformer-based clause classification (RoBERTa-legal) |
-| Risk Scoring | 📋 Planned | Clause-level and document-level risk assessment |
-| API Layer | 🚧 In Progress | REST endpoints for all core services |
+## Code Quality Standards
 
-## Repository Maintenance
+Before creating a pull request:
 
-This repository follows a collaborative development model. All contributors are acknowledged in the commit history. For contribution guidelines, see `CONTRIBUTING.md`.
+Run tests:
 
-### Recent Development Milestones
+```bash
+pytest
+```
 
-- **Week 1**: Dataset ingestion pipeline, OCR enhancement, NER processor implementation
-- **Week 2**: Clause classifier fine-tuning, evaluation metrics, post-processing heuristics
+Run linting:
 
-## Branch Strategy
+```bash
+ruff check .
+```
 
-- `main` — Production releases
-- `develop` — Integration branch for features
-- `feature/*` — Feature branches for active development
+Format code where required.
 
-See `DEVELOPMENT_GUIDE.md` for detailed branching workflow.
+---
 
-## Documentation
-### Main Branches
-- `main` → Production-ready stable code
-- `develop` → Integration branch for all completed features
+## Pull Request Requirements
 
-### Feature Branches
-- `feature/dataset-cleaning` → Lakshay
-- `feature/ocr-pipeline` → Ahmad
-- `feature/ner-extraction` → Sahasra
-- `feature/fastapi-backend` → Sandeep
-- `feature/clause-risk-scoring` → Azmat
-- `feature/integration-testing` → System integration and final testing
+All pull requests should:
 
-### Merge Flow
+* Address a single feature or issue
+* Include meaningful commit messages
+* Pass all automated tests
+* Follow repository structure conventions
+* Include documentation updates when necessary
 
-feature/* → develop → main
+---
 
-### Workflow Rules
+## Commit Message Convention
 
-1. No direct commits to `main`.
-2. All development must occur on feature branches.
-3. Feature branches are merged into `develop` via Pull Requests.
-4. Integration testing is performed on `develop`.
-5. Only tested and approved code is merged from `develop` to `main`.
-6. Every team member must push commits daily with meaningful commit messages.
+Examples:
 
-- [Development Guide](DEVELOPMENT_GUIDE.md) — Build, test, and deployment procedures
-- [Contributing Guidelines](CONTRIBUTING.md) — How to contribute to this project
-- [Code of Conduct](CODE_OF_CONDUCT.md) — Community standards
-- [Project Setup](PROJECT_SETUP.md) — Environment configuration
-- [Branching Strategy](BRANCHING_STRATEGY.md) — Git workflow
+```text
+feat: add OCR preprocessing pipeline
+fix: resolve import path issue in CI
+docs: update project architecture
+test: add NER integration tests
+```
 
-## License
+---
 
-Proprietary — All rights reserved.
-| Member | Module |
-|--------|--------|
-| Lakshay | Dataset and also Cleaning |
-| Ahmad | OCR Pipeline + Risk Scoring|
-| Sahasra | NER Extraction |
-| Sandeep| FastAPI Backend |
-| Azmat | Clause Classification + Integration |
+## Reporting Issues
+
+When reporting an issue, include:
+
+* Description of the problem
+* Expected behavior
+* Actual behavior
+* Steps to reproduce
+* Environment information
+
+---
+
+## Project Philosophy
+
+The objective of this project is to build reliable and explainable Legal NLP systems through clean engineering practices, reproducible experimentation, and maintainable software architecture.
