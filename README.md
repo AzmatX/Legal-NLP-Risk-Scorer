@@ -105,8 +105,8 @@ feature/* → develop → main
 Proprietary — All rights reserved.
 | Member | Module |
 |--------|--------|
-| Lakshay Kundaeiya | Dataset and also Cleaning |
-| Ahmad Malik | OCR Pipeline + Risk Scoring|
+| Lakshay | Dataset and also Cleaning |
+| Ahmad | OCR Pipeline + Risk Scoring|
 | Sahasra | NER Extraction |
-| Sandeep Singh | FastAPI Backend |
-| Azmat Ahmad | Clause Classification + Integration |
+| Sandeep| FastAPI Backend |
+| Azmat | Clause Classification + Integration |
