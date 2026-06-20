@@ -1,3 +1,4 @@
+![Project Banner](assets/images/Banner.png)
 # Contributing Guidelines
 
 Thank you for your interest in contributing to the AI-Powered Contract Intelligence & Risk Scoring System.
