@@ -1,4 +1,4 @@
-# Merge Plan
+# Merge Plan to be implemented by 26 June 2026
 
 This document outlines the proposed merge strategy for integrating feature branches into the `develop` branch, and finally `develop` into `main`. It identifies the merge order, files affected, expected conflicts, and the resolution strategy for each step.
 
