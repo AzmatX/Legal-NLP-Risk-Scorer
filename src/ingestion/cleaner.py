@@ -148,7 +148,8 @@ class TextCleaner:
 
         # Build combined header/footer regex once (static across instances)
         if TextCleaner._combined_header_footer_regex is None:
-            # Wrap each pattern to match the full stripped line, ignoring case and optional whitespace
+            # Wrap each pattern to match the full stripped line,
+            # ignoring case and optional whitespace
             combined = "|".join(rf"(?:{p})" for p in self.HEADER_FOOTER_PATTERNS)
             # Anchor to start and end of stripped line (since we strip before matching)
             TextCleaner._combined_header_footer_regex = re.compile(
