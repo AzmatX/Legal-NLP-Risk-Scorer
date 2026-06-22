@@ -244,7 +244,7 @@ class TextCleaner:
     def extract_clean_sections(
         self,
         text: str,
-        section_markers: Optional[list[str]] = None
+        section_markers: list[str] | None = None
     ) -> dict[str, str]:
         """
         Extract and clean specific sections from a contract.
