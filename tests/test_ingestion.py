@@ -94,6 +94,7 @@ Payment details."""
     assert isinstance(sections, list)
     assert len(sections) >= 1
     assert any("Service Agreement" in section for section in sections)
+        
 
 
 class TestContractValidator:
