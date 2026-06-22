@@ -8,7 +8,7 @@ checking file integrity, content quality, and format compliance.
 import hashlib
 import json
 import logging
-from datetime import UTC, datetime
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
