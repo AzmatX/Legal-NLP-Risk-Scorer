@@ -109,8 +109,8 @@ class TestContractValidator:
         """Test validation of a valid contract."""
         validator = ContractValidator()
 
-        result = validator.validate("test.pdf", "This is a valid contract text with sufficient length.")
-
+       text_sample = "This is a valid contract text with sufficient length."
+       result = validator.validate("test.pdf", text_sample)
         assert result is True
 
     def test_empty_filename_raises_error(self):
