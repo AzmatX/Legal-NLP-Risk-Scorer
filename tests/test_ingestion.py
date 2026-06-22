@@ -92,11 +92,11 @@ class TestTextCleaner:
         SECTION 2.1 Payment Terms
         Payment details."""
 
-        sections = cleaner.extract_clean_sections(text)
+        result = cleaner.extract_clean_sections(text)
 
-        assert isinstance(sections, dict)
-        assert len(sections.values()) > 0
-        assert all(isinstance(v, str) for v in sections.values())
+        assert isinstance(result, dict)
+        assert len(result.values()) > 0
+        assert all(isinstance(v, str) for v in result.values())
 
 
 class TestContractValidator:
