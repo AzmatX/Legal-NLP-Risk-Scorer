@@ -10,7 +10,12 @@ src/api/main.py
 src/clause_classifier/__init__.py
 src/clause_classifier/service.py
 src/ingestion/__init__.py
+src/ingestion/cleaner.py
+src/ingestion/cuad_loader.py
+src/ingestion/file_processor.py
+src/ingestion/schema.py
 src/ingestion/service.py
+src/ingestion/validator.py
 src/ner/__init__.py
 src/ner/service.py
 src/ocr/__init__.py
@@ -25,4 +30,7 @@ src/utils/config.py
 src/vector_store/__init__.py
 src/vector_store/service.py
 tests/test_api.py
+tests/test_day1.py
+tests/test_day2.py
+tests/test_day3_cuad_parser.py
 tests/test_ingestion.py
