@@ -7,9 +7,8 @@ checking file integrity, content quality, and format compliance.
 
 import hashlib
 import logging
-import os
 from pathlib import Path
-from typing import Any, Optional, Tuple
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -56,7 +55,9 @@ class ContractValidator:
         },
         '.docx': {
             'magic_bytes': b'PK\x03\x04',  # ZIP signature
-            'mime_types': ['application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
+            'mime_types': [
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+],
             'description': 'Microsoft Word Document'
         },
         '.json': {
@@ -362,7 +363,7 @@ class ContractValidator:
     def get_validation_report(
         self,
         file_path: str,
-        text: Optional[str] = None
+        text: str | None = None
     ) -> dict[str, Any]:
         """
         Generate a comprehensive validation report.

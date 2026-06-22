@@ -4,17 +4,12 @@ Test suite for Enhanced Data Ingestion Pipeline.
 Tests cover text cleaning, validation, file processing, and caching.
 """
 
-import json
-import os
-import tempfile
-from pathlib import Path
-
 import pytest
 
 from src.ingestion.cleaner import TextCleaner
-from src.ingestion.validator import ContractValidator, ContractValidationError
-from src.ingestion.schema import ContractSchema
 from src.ingestion.file_processor import ContractProcessor
+from src.ingestion.schema import ContractSchema
+from src.ingestion.validator import ContractValidationError, ContractValidator
 
 
 class TestTextCleaner:
@@ -105,12 +100,12 @@ class TestTextCleaner:
 class TestContractValidator:
     """Tests for the enhanced contract validator."""
 
-    def test_valid_contract(self):
-        """Test validation of a valid contract."""
+    def test_valid_text_passes_validation(self):
+        """Test that valid text passes validation."""
         validator = ContractValidator()
 
-       text_sample = "This is a valid contract text with sufficient length."
-       result = validator.validate("test.pdf", text_sample)
+        text_sample = "This is a valid contract text with sufficient length."
+        result = validator.validate("test.pdf", text_sample)
         assert result is True
 
     def test_empty_filename_raises_error(self):
@@ -144,9 +139,9 @@ class TestContractValidator:
 
         result = validator.validate_file_path(str(test_file))
 
-        assert result['valid'] is True
-        assert result['file_size'] > 0
-        assert result['file_type'] == '.pdf'
+        assert result["valid"] is True
+        assert result["file_size"] > 0
+        assert result["file_type"] == ".pdf"
 
     def test_validate_nonexistent_file(self):
         """Test validation of nonexistent file."""
@@ -172,18 +167,18 @@ class TestContractValidator:
         valid_json = '{"key": "value", "list": [1, 2, 3]}'
         result = validator.validate_json_structure(valid_json)
 
-        assert result['valid'] is True
-        assert 'key' in result['keys']
+        assert result["valid"] is True
+        assert "key" in result["keys"]
 
     def test_invalid_json_structure(self):
         """Test invalid JSON detection."""
         validator = ContractValidator()
 
-        invalid_json = '{invalid json}'
+        invalid_json = "{invalid json}"
         result = validator.validate_json_structure(invalid_json)
 
-        assert result['valid'] is False
-        assert result['error'] is not None
+        assert result["valid"] is False
+        assert result["error"] is not None
 
     def test_get_validation_report(self, tmp_path):
         """Test comprehensive validation report generation."""
@@ -195,9 +190,9 @@ class TestContractValidator:
 
         report = validator.get_validation_report(str(test_file), test_content)
 
-        assert 'file_path' in report
-        assert 'checks' in report
-        assert 'overall_valid' in report
+        assert "file_path" in report
+        assert "checks" in report
+        assert "overall_valid" in report
 
 
 class TestContractSchema:
@@ -209,7 +204,7 @@ class TestContractSchema:
             file_name="test.pdf",
             text="Contract text",
             entities={"ORG": ["Acme Corp"]},
-            clauses={"governing_law": "New York"}
+            clauses={"governing_law": "New York"},
         )
 
         assert schema.file_name == "test.pdf"
@@ -221,14 +216,14 @@ class TestContractSchema:
             file_name="test.pdf",
             text="Contract text",
             entities={},
-            clauses={}
+            clauses={},
         )
 
         result = schema.to_dict()
 
         assert isinstance(result, dict)
-        assert 'file_name' in result
-        assert 'text' in result
+        assert "file_name" in result
+        assert "text" in result
 
 
 class TestContractProcessor:
@@ -242,10 +237,10 @@ class TestContractProcessor:
         result = processor.process_text("test.pdf", text)
 
         assert isinstance(result, dict)
-        assert 'file_name' in result
-        assert 'text' in result
-        assert 'entities' in result
-        assert 'clauses' in result
+        assert "file_name" in result
+        assert "text" in result
+        assert "entities" in result
+        assert "clauses" in result
 
     def test_processor_with_validator(self):
         """Test processor uses validator correctly."""
@@ -307,4 +302,4 @@ def test_full_ingestion_pipeline(sample_contract_text):
 
     # Process
     result = processor.process_text("contract.pdf", cleaned)
-    assert result['processed'] is True or isinstance(result, dict)
+    assert result["processed"] is True or isinstance(result, dict)

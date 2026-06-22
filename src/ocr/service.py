@@ -13,7 +13,7 @@ import os
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +37,7 @@ class OCRCache:
         """Get path to cache file."""
         return self.cache_dir / f"{cache_key}.json"
 
-    def get(self, content: bytes) -> Optional[dict]:
+    def get(self, content: bytes) -> dict | None:
         """Retrieve cached OCR result if available."""
         import json
 
@@ -46,7 +46,7 @@ class OCRCache:
 
         if cache_file.exists():
             try:
-                with open(cache_file, 'r', encoding='utf-8') as f:
+                with open(cache_file, encoding='utf-8') as f:
                     result = json.load(f)
                     logger.debug(f"Cache hit for {cache_key[:16]}")
                     return result
@@ -142,7 +142,6 @@ class OptimizedOCRProcessor:
 
         # Check EasyOCR
         try:
-            import easyocr
             self.easyocr_available = True
             logger.info("EasyOCR available")
         except Exception:
@@ -150,7 +149,6 @@ class OptimizedOCRProcessor:
 
         # Check PaddleOCR
         try:
-            from paddleocr import PaddleOCR
             self.paddleocr_available = True
             logger.info("PaddleOCR available")
         except Exception:
@@ -158,7 +156,6 @@ class OptimizedOCRProcessor:
 
         # Check pdf2image
         try:
-            from pdf2image import convert_from_bytes
             self.pdf2image_available = True
             logger.info("pdf2image available")
         except Exception:
@@ -389,8 +386,8 @@ class OptimizedOCRProcessor:
 
     def _ocr_with_paddleocr(self, image: Any) -> str:
         """Extract text using PaddleOCR."""
-        from paddleocr import PaddleOCR
         import numpy as np
+        from paddleocr import PaddleOCR
 
         # Initialize OCR (should be done once in production)
         ocr = PaddleOCR(use_angle_cls=True, lang='en', show_log=False)
@@ -411,7 +408,7 @@ class OptimizedOCRProcessor:
 
 
 # Legacy function wrappers for backward compatibility
-_default_processor: Optional[OptimizedOCRProcessor] = None
+_default_processor: OptimizedOCRProcessor | None = None
 
 
 def _get_default_processor() -> OptimizedOCRProcessor:
