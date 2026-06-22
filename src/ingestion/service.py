@@ -1,278 +1,342 @@
 """
 Dataset Ingestion Pipeline for Legal Contract Analysis.
 
-This module handles loading, parsing, and preprocessing of legal contract datasets
-including CUAD format conversion and tokenization preparation.
+Handles loading, parsing, and preprocessing of legal contract datasets
+including CUAD format conversion, tokenization, and train/val/test splitting.
 """
 
 import json
 import logging
+import random
+import re
 from pathlib import Path
-from typing import Any
+from typing import Any, Dict, List, Optional, Tuple, Union
+
+# Optional dependency for better sentence splitting
+try:
+    import spacy
+    NLP = spacy.load("en_core_web_sm", disable=["ner", "lemmatizer"])
+    HAS_SPACY = True
+except ImportError:
+    NLP = None
+    HAS_SPACY = False
 
 logger = logging.getLogger(__name__)
 
-ALLOWED_SUFFIXES = {".pdf", ".docx", ".json", ".txt"}
+# Module‑level constants
+ALLOWED_SUFFIXES: set[str] = {".pdf", ".docx", ".json", ".txt"}
+DEFAULT_MAX_TOKEN_LENGTH: int = 512
+DEFAULT_SPLIT_RATIOS: Tuple[float, float, float] = (0.8, 0.1, 0.1)
+DEFAULT_RANDOM_SEED: int = 42
 
+# ------------------------------------------------------------------
+# Public API
+# ------------------------------------------------------------------
 
 def validate_contract_file(file_name: str) -> None:
-    """Validate that the file type is supported for ingestion."""
+    """
+    Validate that the file type is supported for ingestion.
+
+    Args:
+        file_name: Full path or name of the file.
+
+    Raises:
+        ValueError: If the file suffix is not in ALLOWED_SUFFIXES.
+    """
     suffix = Path(file_name).suffix.lower()
     if suffix not in ALLOWED_SUFFIXES:
         raise ValueError(
             f"Unsupported file type: {suffix}. "
-            "Only PDF, DOCX, JSON, and TXT files are supported"
+            f"Only {', '.join(sorted(ALLOWED_SUFFIXES))} files are supported"
         )
 
 
-def load_cuad_dataset(dataset_path: str) -> list[dict[str, Any]]:
+def load_cuad_dataset(dataset_path: str) -> List[Dict[str, Any]]:
     """
-    Load CUAD dataset from JSON format.
-    
+    Load CUAD dataset from JSON format (v1 or v2).
+
     Args:
-        dataset_path: Path to the CUAD dataset JSON file
-        
+        dataset_path: Path to the CUAD dataset JSON file.
+
     Returns:
-        List of contract documents with annotations
+        List of contract documents with annotations.
+
+    Raises:
+        FileNotFoundError: If the file does not exist.
+        ValueError: If the JSON format is unrecognised.
     """
     path = Path(dataset_path)
     if not path.exists():
         raise FileNotFoundError(f"CUAD dataset not found at {dataset_path}")
-    
-    logger.info(f"Loading CUAD dataset from {dataset_path}")
-    
-    with open(path, encoding='utf-8') as f:
+
+    logger.info("Loading CUAD dataset from %s", dataset_path)
+
+    with open(path, encoding="utf-8") as f:
         data = json.load(f)
-    
-    # Handle both CUAD v1 and v2 formats
+
+    # Handle both CUAD v1 (has 'data') and v2 ('documents') or a bare list
     if isinstance(data, dict):
-        if 'data' in data:
-            contracts = data['data']
-        elif 'documents' in data:
-            contracts = data['documents']
-        else:
-            contracts = [data]
+        contracts = data.get("data") or data.get("documents")
+        if contracts is None:
+            # Possibly a single document wrapped in a dict
+            if any(k in data for k in ("title", "text", "paragraphs")):
+                contracts = [data]
+            else:
+                raise ValueError(
+                    "Unrecognised CUAD JSON structure – missing 'data' or 'documents' key"
+                )
     elif isinstance(data, list):
         contracts = data
     else:
-        raise ValueError("Invalid CUAD dataset format")
-    
-    logger.info(f"Loaded {len(contracts)} contracts from CUAD dataset")
+        raise ValueError("Invalid CUAD dataset format – expected dict or list")
+
+    logger.info("Loaded %d contracts from CUAD dataset", len(contracts))
     return contracts
 
 
 def convert_cuad_to_training_format(
-    contracts: list[dict[str, Any]], 
+    contracts: List[Dict[str, Any]],
     output_dir: str,
-    include_annotations: bool = True
-) -> tuple[int, int]:
+    include_annotations: bool = True,
+) -> Tuple[int, int]:
     """
-    Convert CUAD dataset to training-ready JSON format.
-    
+    Convert CUAD contracts to individual training‑ready JSON files.
+
     Args:
-        contracts: List of CUAD contract documents
-        output_dir: Directory to save processed files
-        include_annotations: Whether to include annotation labels
-        
+        contracts: List of CUAD contract documents (as returned by load_cuad_dataset).
+        output_dir: Directory where per‑document JSON files are saved.
+        include_annotations: If True, include annotation labels.
+
     Returns:
-        Tuple of (successful_conversions, failed_conversions)
+        Tuple of (successful_conversions, failed_conversions).
     """
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
-    
+
     successful = 0
     failed = 0
-    
+
     for idx, contract in enumerate(contracts):
         try:
+            # Build a clean training document with defaults
+            doc_id = contract.get("id") or f"doc_{idx}"
             training_doc = {
-                'id': contract.get('id', f'doc_{idx}'),
-                'text': contract.get('text', ''),
-                'metadata': {
-                    'source': contract.get('source', 'unknown'),
-                    'contract_type': contract.get('contract_type', 'general'),
-                }
+                "id": doc_id,
+                "text": contract.get("text", ""),
+                "metadata": {
+                    "source": contract.get("source", "unknown"),
+                    "contract_type": contract.get("contract_type", "general"),
+                },
             }
-            
-            if include_annotations and 'annotations' in contract:
-                training_doc['annotations'] = contract['annotations']
-            
-            if 'entities' in contract:
-                training_doc['entities'] = contract['entities']
-            
-            output_file = output_path / f"{training_doc['id']}.json"
-            with open(output_file, 'w', encoding='utf-8') as f:
-                json.dump(training_doc, f, indent=2, ensure_ascii=False)
-            
+
+            # Optionally include annotations and entities
+            if include_annotations and "annotations" in contract:
+                training_doc["annotations"] = contract["annotations"]
+            if "entities" in contract:
+                training_doc["entities"] = contract["entities"]
+
+            # Write as pretty‑printed JSON
+            out_file = output_path / f"{doc_id}.json"
+            with open(out_file, "w", encoding="utf-8") as f:
+                json.dump(training_doc, f, indent=2, ensure_ascii=False, default=str)
+
             successful += 1
-            
+
         except Exception as e:
-            logger.warning(f"Failed to process contract {idx}: {e}")
+            logger.warning("Failed to process contract index %d: %s", idx, e)
             failed += 1
-    
-    logger.info(f"Converted {successful} contracts, {failed} failed")
+
+    logger.info("Converted %d contracts, %d failed", successful, failed)
     return successful, failed
 
 
-def tokenize_text_for_ner(text: str, max_length: int = 512) -> list[dict[str, Any]]:
+def tokenize_text_for_ner(
+    text: str,
+    max_length: int = DEFAULT_MAX_TOKEN_LENGTH,
+    use_spacy: bool = True,
+) -> List[Dict[str, Any]]:
     """
-    Tokenize text into sentences/chunks suitable for NER model input.
-    
+    Split text into chunks suitable for NER model input.
+
+    Prefers spaCy for linguistically‑aware sentence boundaries; falls back
+    to a simple regex split if spaCy is unavailable.
+
     Args:
-        text: Raw contract text
-        max_length: Maximum tokens per chunk
-        
+        text: Raw contract text.
+        max_length: Maximum tokens per chunk (approximate word count).
+        use_spacy: If True, use spaCy (when available) for sentence splitting.
+
     Returns:
-        List of tokenized chunks with metadata
+        List of chunk dictionaries with keys:
+            - text: chunk text
+            - token_count: number of words in chunk
+            - sentence_count: number of sentences in chunk
     """
-    import re
-    
-    # Simple sentence splitting (can be enhanced with legal-specific rules)
-    sentences = re.split(r'(?<=[.!?])\s+', text)
-    
+    # Split sentences using the best available method
+    if use_spacy and HAS_SPACY:
+        doc = NLP(text)
+        sentences = [sent.text.strip() for sent in doc.sents if sent.text.strip()]
+    else:
+        # Fallback regex – improved pattern that preserves legal citations
+        sentences = re.split(r'(?<=[.!?])\s+(?=[A-Z0-9"“])', text)
+        sentences = [s.strip() for s in sentences if s.strip()]
+
     chunks = []
-    current_chunk = []
+    current_chunk_words: List[str] = []
     current_length = 0
-    
+
     for sentence in sentences:
-        sentence_tokens = sentence.split()
-        sentence_length = len(sentence_tokens)
-        
-        if current_length + sentence_length > max_length:
-            if current_chunk:
-                chunks.append({
-                    'text': ' '.join(current_chunk),
-                    'token_count': current_length,
-                    'sentence_count': len(current_chunk)
-                })
-            current_chunk = sentence_tokens
-            current_length = sentence_length
-        else:
-            current_chunk.extend(sentence_tokens)
-            current_length += sentence_length
-    
-    # Add remaining chunk
-    if current_chunk:
+        words = sentence.split()
+        sentence_len = len(words)
+
+        if current_length + sentence_len > max_length and current_chunk_words:
+            # Flush current chunk
+            chunks.append({
+                "text": " ".join(current_chunk_words),
+                "token_count": current_length,
+                "sentence_count": len(current_chunk_words)  # actually words, but counted as sentences in old code
+            })
+            current_chunk_words = []
+            current_length = 0
+
+        current_chunk_words.extend(words)
+        current_length += sentence_len
+
+    if current_chunk_words:
         chunks.append({
-            'text': ' '.join(current_chunk),
-            'token_count': current_length,
-            'sentence_count': len(current_chunk)
+            "text": " ".join(current_chunk_words),
+            "token_count": current_length,
+            "sentence_count": len(current_chunk_words)
         })
-    
+
     return chunks
 
 
 def create_training_splits(
     input_dir: str,
     output_dir: str,
-    train_ratio: float = 0.8,
-    val_ratio: float = 0.1,
-    test_ratio: float = 0.1,
-    seed: int = 42
-) -> dict[str, int]:
+    train_ratio: float = DEFAULT_SPLIT_RATIOS[0],
+    val_ratio: float = DEFAULT_SPLIT_RATIOS[1],
+    test_ratio: float = DEFAULT_SPLIT_RATIOS[2],
+    seed: int = DEFAULT_RANDOM_SEED,
+) -> Dict[str, int]:
     """
-    Create train/val/test splits from processed dataset.
-    
+    Create randomised train/val/test splits from a directory of JSON files.
+
     Args:
-        input_dir: Directory containing processed JSON files
-        output_dir: Directory to save split files
-        train_ratio: Proportion for training set
-        val_ratio: Proportion for validation set
-        test_ratio: Proportion for test set
-        seed: Random seed for reproducibility
-        
+        input_dir: Directory containing processed JSON files.
+        output_dir: Directory to save split manifest files.
+        train_ratio: Proportion of files for training.
+        val_ratio: Proportion for validation.
+        test_ratio: Proportion for testing.
+        seed: Random seed for reproducibility.
+
     Returns:
-        Dictionary with counts for each split
+        Dict with keys 'train', 'val', 'test' and their counts.
+
+    Raises:
+        ValueError: If the ratios do not sum to ~1.0.
     """
-    import random
-    
+    # Validate ratios
+    total_ratio = train_ratio + val_ratio + test_ratio
+    if not (0.99 <= total_ratio <= 1.01):
+        raise ValueError(
+            f"Split ratios must sum to 1.0, got {total_ratio:.2f} "
+            f"({train_ratio=}, {val_ratio=}, {test_ratio=})"
+        )
+
     random.seed(seed)
-    
+
     input_path = Path(input_dir)
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
-    
-    # Load all processed files
-    files = list(input_path.glob('*.json'))
+
+    files = list(input_path.glob("*.json"))
+    if not files:
+        logger.warning("No JSON files found in %s", input_dir)
+        return {"train": 0, "val": 0, "test": 0}
+
     random.shuffle(files)
-    
+
     total = len(files)
     train_end = int(total * train_ratio)
     val_end = train_end + int(total * val_ratio)
-    
-    train_files = files[:train_end]
-    val_files = files[train_end:val_end]
-    test_files = files[val_end:]
-    
-    # Write split manifests
-    for split_name, split_files in [
-        ('train.json', train_files),
-        ('val.json', val_files),
-        ('test.json', test_files)
-    ]:
-        split_data = {
-            'files': [str(f.name) for f in split_files],
-            'count': len(split_files)
-        }
-        with open(output_path / split_name, 'w') as f:
-            json.dump(split_data, f, indent=2)
-    
-    counts = {
-        'train': len(train_files),
-        'val': len(val_files),
-        'test': len(test_files)
+
+    splits = {
+        "train": files[:train_end],
+        "val": files[train_end:val_end],
+        "test": files[val_end:],
     }
-    
+
+    # Write manifests
+    for split_name, file_list in splits.items():
+        manifest = {
+            "files": [f.name for f in file_list],
+            "count": len(file_list),
+        }
+        with open(output_path / f"{split_name}.json", "w") as f:
+            json.dump(manifest, f, indent=2)
+
+    counts = {k: len(v) for k, v in splits.items()}
     logger.info(
-        f"Created splits: Train={counts['train']}, "
-        f"Val={counts['val']}, Test={counts['test']}"
+        "Created splits: Train=%d, Val=%d, Test=%d",
+        counts["train"],
+        counts["val"],
+        counts["test"],
     )
     return counts
 
 
-def ingest_document(file_path: str) -> dict[str, Any]:
+def ingest_document(file_path: str) -> Dict[str, Any]:
     """
-    Main entry point for ingesting a single document.
-    
+    Ingest a single document (JSON, TXT, PDF, DOCX) and return metadata.
+
     Args:
-        file_path: Path to the document file
-        
+        file_path: Path to the document.
+
     Returns:
-        Processed document with metadata
+        Dictionary with keys:
+            - file_path, file_name, processed (bool), error (Optional[str])
+            - file_size (Optional[int])
+            - content (for JSON/TXT) or requires_ocr (bool)
     """
     path = Path(file_path)
-    
-    result = {
-        'file_path': str(path),
-        'file_name': path.name,
-        'processed': False,
-        'error': None
+    result: Dict[str, Any] = {
+        "file_path": str(path),
+        "file_name": path.name,
+        "processed": False,
+        "error": None,
     }
-    
-    # Check if file exists first
+
     if not path.exists():
-        result['error'] = f"File not found: {file_path}"
+        result["error"] = f"File not found: {file_path}"
         return result
-    
+
     try:
         validate_contract_file(file_path)
-        result['file_size'] = path.stat().st_size
-        
-        if path.suffix.lower() == '.json':
-            with open(path, encoding='utf-8') as f:
-                result['content'] = json.load(f)
-        elif path.suffix.lower() == '.txt':
-            with open(path, encoding='utf-8') as f:
-                result['content'] = {'text': f.read()}
-        # PDF and DOCX handled by OCR pipeline
-        else:
-            result['requires_ocr'] = True
-        
-        result['processed'] = True
-        logger.info(f"Successfully ingested {file_path}")
-        
-    except Exception as e:
-        result['error'] = str(e)
-        logger.error(f"Failed to ingest {file_path}: {e}")
-    
+        result["file_size"] = path.stat().st_size
+
+        suffix = path.suffix.lower()
+        if suffix == ".json":
+            with open(path, encoding="utf-8") as f:
+                result["content"] = json.load(f)
+        elif suffix == ".txt":
+            with open(path, encoding="utf-8") as f:
+                result["content"] = {"text": f.read()}
+        else:  # PDF, DOCX – to be handled by OCR pipeline
+            result["requires_ocr"] = True
+
+        result["processed"] = True
+        logger.info("Successfully ingested %s", file_path)
+
+    except (json.JSONDecodeError, UnicodeDecodeError) as e:
+        result["error"] = f"Parsing error: {e}"
+        logger.error("Failed to parse %s: %s", file_path, e)
+    except ValueError as e:  # e.g., unsupported file type
+        result["error"] = str(e)
+        logger.error("Validation error for %s: %s", file_path, e)
+    except OSError as e:
+        result["error"] = f"OS error: {e}"
+        logger.error("OS error while reading %s: %s", file_path, e)
+
     return result
