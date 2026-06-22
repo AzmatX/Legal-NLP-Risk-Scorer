@@ -7,11 +7,13 @@ Provides two loading strategies:
 """
 
 import json
-from typing import Any, Dict, Iterator, List
+from collections.abc import Iterator
+from typing import Any
 
 # Optional streaming dependency – install with: pip install ijson
 try:
     import ijson
+
     HAS_IJSON = True
 except ImportError:
     HAS_IJSON = False
@@ -32,7 +34,7 @@ class CUADLoader:
     # ------------------------------------------------------------------
     # Public methods
     # ------------------------------------------------------------------
-    def load(self, file_path: str) -> List[Dict[str, Any]]:
+    def load(self, file_path: str) -> list[dict[str, Any]]:
         """
         Load the CUAD JSON file fully into memory and flatten its structure.
 
@@ -52,15 +54,11 @@ class CUADLoader:
 
         # Validate top‑level structure
         if not isinstance(data, dict) or self.DATA_KEY not in data:
-            raise ValueError(
-                f"Invalid JSON format: expected dict with key '{self.DATA_KEY}'"
-            )
+            raise ValueError(f"Invalid JSON format: expected dict with key '{self.DATA_KEY}'")
 
         contracts_data = data[self.DATA_KEY]
         if not isinstance(contracts_data, list):
-            raise ValueError(
-                f"'{self.DATA_KEY}' must be a list, got {type(contracts_data)}"
-            )
+            raise ValueError(f"'{self.DATA_KEY}' must be a list, got {type(contracts_data)}")
 
         # Flatten using a list comprehension (fast and readable)
         return [
@@ -75,7 +73,7 @@ class CUADLoader:
             if isinstance(paragraph, dict)
         ]
 
-    def load_stream(self, file_path: str) -> Iterator[Dict[str, Any]]:
+    def load_stream(self, file_path: str) -> Iterator[dict[str, Any]]:
         """
         Stream the CUAD JSON file using ijson – constant memory footprint.
 
@@ -95,13 +93,12 @@ class CUADLoader:
         """
         if not HAS_IJSON:
             raise ImportError(
-                "The ijson library is required for streaming. "
-                "Install it with: pip install ijson"
+                "The ijson library is required for streaming. Install it with: pip install ijson"
             )
 
-        with open(file_path, 'rb') as f:
+        with open(file_path, "rb") as f:
             # ijson.items parses the "data" array item by item
-            for contract in ijson.items(f, 'data.item'):
+            for contract in ijson.items(f, "data.item"):
                 title = contract[self.TITLE_KEY]
 
                 # Paragraphs can be missing – safely iterate

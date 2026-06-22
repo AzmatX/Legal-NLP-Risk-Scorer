@@ -3,7 +3,7 @@ Contract Schema definition using dataclasses.
 """
 
 from dataclasses import asdict, dataclass, field
-from typing import Any, Dict
+from typing import Any
 
 
 @dataclass
@@ -21,10 +21,10 @@ class ContractSchema:
     file_name: str
     text: str
     # Use default_factory for mutable defaults (safety and clarity)
-    entities: Dict[str, Any] = field(default_factory=dict)
-    clauses: Dict[str, Any] = field(default_factory=dict)
+    entities: dict[str, Any] = field(default_factory=dict)
+    clauses: dict[str, Any] = field(default_factory=dict)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """
         Convert the dataclass to a plain dictionary.
 
@@ -34,7 +34,7 @@ class ContractSchema:
         return asdict(self)
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "ContractSchema":
+    def from_dict(cls, data: dict[str, Any]) -> "ContractSchema":
         """
         Create a ContractSchema instance from a dictionary.
 

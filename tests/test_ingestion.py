@@ -4,11 +4,8 @@ Test suite for Enhanced Data Ingestion Pipeline.
 Tests cover text cleaning, validation, file processing, and caching.
 """
 
-from email.mime import text
-
 import pytest
 
-from src.ingestion import cleaner
 from src.ingestion.cleaner import TextCleaner
 from src.ingestion.file_processor import ContractProcessor
 from src.ingestion.schema import ContractSchema
@@ -82,18 +79,22 @@ class TestTextCleaner:
         assert cleaner.clean(None) == ""
         assert cleaner.clean("   ") == ""
 
+
+
+# Correct:
     def test_extract_clean_sections(self):
-    """Test section extraction and cleaning from contracts."""
-    cleaner = TextCleaner()
-    text = """Service Agreement
+        """Test section extraction..."""
+        
+        cleaner = TextCleaner()
+        text = """Service Agreement
 
 Payment details."""
 
-    sections = cleaner.extract_clean_sections(text)
+        sections = cleaner.extract_clean_sections(text)
 
-    assert isinstance(sections, list)
-    assert len(sections) >= 1
-    assert any("Service Agreement" in section for section in sections)
+        assert isinstance(sections, list)
+        assert len(sections) >= 1
+        assert any("Service Agreement" in section for section in sections)
 
 
 class TestContractValidator:

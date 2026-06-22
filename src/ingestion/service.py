@@ -10,11 +10,12 @@ import logging
 import random
 import re
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any
 
 # Optional dependency for better sentence splitting
 try:
     import spacy
+
     NLP = spacy.load("en_core_web_sm", disable=["ner", "lemmatizer"])
     HAS_SPACY = True
 except ImportError:
@@ -26,12 +27,13 @@ logger = logging.getLogger(__name__)
 # Module‑level constants
 ALLOWED_SUFFIXES: set[str] = {".pdf", ".docx", ".json", ".txt"}
 DEFAULT_MAX_TOKEN_LENGTH: int = 512
-DEFAULT_SPLIT_RATIOS: Tuple[float, float, float] = (0.8, 0.1, 0.1)
+DEFAULT_SPLIT_RATIOS: tuple[float, float, float] = (0.8, 0.1, 0.1)
 DEFAULT_RANDOM_SEED: int = 42
 
 # ------------------------------------------------------------------
 # Public API
 # ------------------------------------------------------------------
+
 
 def validate_contract_file(file_name: str) -> None:
     """
@@ -51,7 +53,7 @@ def validate_contract_file(file_name: str) -> None:
         )
 
 
-def load_cuad_dataset(dataset_path: str) -> List[Dict[str, Any]]:
+def load_cuad_dataset(dataset_path: str) -> list[dict[str, Any]]:
     """
     Load CUAD dataset from JSON format (v1 or v2).
 
@@ -95,10 +97,10 @@ def load_cuad_dataset(dataset_path: str) -> List[Dict[str, Any]]:
 
 
 def convert_cuad_to_training_format(
-    contracts: List[Dict[str, Any]],
+    contracts: list[dict[str, Any]],
     output_dir: str,
     include_annotations: bool = True,
-) -> Tuple[int, int]:
+) -> tuple[int, int]:
     """
     Convert CUAD contracts to individual training‑ready JSON files.
 
@@ -154,7 +156,7 @@ def tokenize_text_for_ner(
     text: str,
     max_length: int = DEFAULT_MAX_TOKEN_LENGTH,
     use_spacy: bool = True,
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """
     Split text into chunks suitable for NER model input.
 
@@ -182,7 +184,7 @@ def tokenize_text_for_ner(
         sentences = [s.strip() for s in sentences if s.strip()]
 
     chunks = []
-    current_chunk_words: List[str] = []
+    current_chunk_words: list[str] = []
     current_length = 0
 
     for sentence in sentences:
@@ -191,11 +193,15 @@ def tokenize_text_for_ner(
 
         if current_length + sentence_len > max_length and current_chunk_words:
             # Flush current chunk
-            chunks.append({
-                "text": " ".join(current_chunk_words),
-                "token_count": current_length,
-                "sentence_count": len(current_chunk_words)  # actually words, but counted as sentences in old code
-            })
+            chunks.append(
+                {
+                    "text": " ".join(current_chunk_words),
+                    "token_count": current_length,
+                    "sentence_count": len(
+                        current_chunk_words
+                    ),  # actually words, but counted as sentences in old code
+                }
+            )
             current_chunk_words = []
             current_length = 0
 
@@ -203,11 +209,13 @@ def tokenize_text_for_ner(
         current_length += sentence_len
 
     if current_chunk_words:
-        chunks.append({
-            "text": " ".join(current_chunk_words),
-            "token_count": current_length,
-            "sentence_count": len(current_chunk_words)
-        })
+        chunks.append(
+            {
+                "text": " ".join(current_chunk_words),
+                "token_count": current_length,
+                "sentence_count": len(current_chunk_words),
+            }
+        )
 
     return chunks
 
@@ -219,7 +227,7 @@ def create_training_splits(
     val_ratio: float = DEFAULT_SPLIT_RATIOS[1],
     test_ratio: float = DEFAULT_SPLIT_RATIOS[2],
     seed: int = DEFAULT_RANDOM_SEED,
-) -> Dict[str, int]:
+) -> dict[str, int]:
     """
     Create randomised train/val/test splits from a directory of JSON files.
 
@@ -287,7 +295,7 @@ def create_training_splits(
     return counts
 
 
-def ingest_document(file_path: str) -> Dict[str, Any]:
+def ingest_document(file_path: str) -> dict[str, Any]:
     """
     Ingest a single document (JSON, TXT, PDF, DOCX) and return metadata.
 
@@ -301,7 +309,7 @@ def ingest_document(file_path: str) -> Dict[str, Any]:
             - content (for JSON/TXT) or requires_ocr (bool)
     """
     path = Path(file_path)
-    result: Dict[str, Any] = {
+    result: dict[str, Any] = {
         "file_path": str(path),
         "file_name": path.name,
         "processed": False,

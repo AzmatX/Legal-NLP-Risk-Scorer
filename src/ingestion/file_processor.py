@@ -4,7 +4,7 @@ File Processor for legal contract documents.
 Orchestrates validation, cleaning, and initial structuring of raw contract text.
 """
 
-from typing import Any, Dict, Optional
+from typing import Any
 
 from src.ingestion.cleaner import TextCleaner
 from src.ingestion.schema import ContractSchema
@@ -26,9 +26,7 @@ class ContractProcessor:
     """
 
     def __init__(
-        self,
-        cleaner: Optional[TextCleaner] = None,
-        validator: Optional[ContractValidator] = None
+        self, cleaner: TextCleaner | None = None, validator: ContractValidator | None = None
     ) -> None:
         """
         Args:
@@ -38,7 +36,7 @@ class ContractProcessor:
         self.cleaner = cleaner if cleaner is not None else TextCleaner()
         self.validator = validator if validator is not None else ContractValidator()
 
-    def process_text(self, file_name: str, text: str) -> Dict[str, Any]:
+    def process_text(self, file_name: str, text: str) -> dict[str, Any]:
         """
         Validate, clean, and structure raw contract text.
 
@@ -56,9 +54,7 @@ class ContractProcessor:
         """
         # Guard against non‑string input
         if not isinstance(text, str):
-            raise TypeError(
-                f"Expected string for 'text', got {type(text).__name__}"
-            )
+            raise TypeError(f"Expected string for 'text', got {type(text).__name__}")
 
         # Validate (raises on failure)
         self.validator.validate(file_name, text)
@@ -67,11 +63,6 @@ class ContractProcessor:
         cleaned_text = self.cleaner.clean(text)
 
         # Create structured data (entities & clauses to be populated later)
-        structured = ContractSchema(
-            file_name=file_name,
-            text=cleaned_text,
-            entities={},
-            clauses={}
-        )
+        structured = ContractSchema(file_name=file_name, text=cleaned_text, entities={}, clauses={})
 
         return structured.to_dict()
