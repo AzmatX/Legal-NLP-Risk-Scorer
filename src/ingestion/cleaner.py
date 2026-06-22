@@ -7,7 +7,6 @@ noise such as headers, footers, page numbers, and special characters.
 """
 
 import re
-from typing import Optional
 
 
 class TextCleaner:
