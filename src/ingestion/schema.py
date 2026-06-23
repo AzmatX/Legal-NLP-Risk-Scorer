@@ -1,3 +1,5 @@
+""" Schema definitions for ingestion."""
+
 from dataclasses import asdict, dataclass
 
 
