@@ -4,12 +4,9 @@ Test suite for Enhanced Data Ingestion Pipeline.
 Tests cover text cleaning, validation, file processing, and caching.
 """
 
-from pydoc import text
-from unittest import result
 
 import pytest
 
-from src.ingestion import cleaner
 from src.ingestion.cleaner import TextCleaner
 from src.ingestion.file_processor import ContractProcessor
 from src.ingestion.schema import ContractSchema

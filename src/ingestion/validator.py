@@ -8,9 +8,9 @@ checking file integrity, content quality, and format compliance.
 import hashlib
 import json
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -49,7 +49,7 @@ class ContractValidator:
     MAX_SPECIAL_CHAR_RATIO = 0.5
 
     # Supported file types with their magic bytes
-    SUPPORTED_FORMATS: Dict[str, Dict[str, Any]] = {
+    SUPPORTED_FORMATS: dict[str, dict[str, Any]] = {
         '.pdf': {
             'magic_bytes': b'%PDF',
             'mime_types': ['application/pdf'],
@@ -147,7 +147,7 @@ class ContractValidator:
         logger.info("Validation successful for %s", file_name)
         return True
 
-    def validate_file_path(self, file_path: str) -> Dict[str, Any]:
+    def validate_file_path(self, file_path: str) -> dict[str, Any]:
         """
         Validate a file path and return metadata.
 
@@ -211,7 +211,7 @@ class ContractValidator:
     # ------------------------------------------------------------------
     # Integrity & content quality
     # ------------------------------------------------------------------
-    def validate_file_integrity(self, file_path: str) -> Dict[str, Any]:
+    def validate_file_integrity(self, file_path: str) -> dict[str, Any]:
         """
         Validate file integrity using magic bytes and MD5 checksum.
 
@@ -279,7 +279,7 @@ class ContractValidator:
 
         return result
 
-    def validate_json_structure(self, text: str) -> Dict[str, Any]:
+    def validate_json_structure(self, text: str) -> dict[str, Any]:
         """
         Validate JSON structure.
 
@@ -293,7 +293,7 @@ class ContractValidator:
                 - keys: list of top‑level or first element keys
                 - error: error message if invalid
         """
-        result: Dict[str, Any] = {
+        result: dict[str, Any] = {
             'valid': False,
             'is_list': False,
             'is_dict': False,
@@ -321,8 +321,8 @@ class ContractValidator:
     def get_validation_report(
         self,
         file_path: str,
-        text: Optional[str] = None
-    ) -> Dict[str, Any]:
+        text: str | None = None
+    ) -> dict[str, Any]:
         """
         Generate a comprehensive validation report.
 
@@ -333,9 +333,9 @@ class ContractValidator:
         Returns:
             Dictionary with overall_valid flag and per‑check results.
         """
-        report: Dict[str, Any] = {
+        report: dict[str, Any] = {
             'file_path': file_path,
-            'timestamp': datetime.now(timezone.utc).isoformat(),
+            'timestamp': datetime.now(UTC).isoformat(),
             'overall_valid': False,
             'checks': {}
         }

@@ -7,7 +7,7 @@ noise such as headers, footers, page numbers, and special characters.
 """
 
 import re
-from typing import Dict, List, Optional, Pattern
+from re import Pattern
 
 
 class TextCleaner:
@@ -66,7 +66,7 @@ class TextCleaner:
     # Allowed character set for preserve mode (built once)
     _allowed_chars_preserve: set[str] = set()
     # Combined header/footer regex (built once per instance, but pattern is static)
-    _combined_header_footer_regex: Optional[Pattern] = None
+    _combined_header_footer_regex: Pattern[str] | None = None
     # Placeholder templates for smart lowercasing (unique)
     _placeholder_prefix: str = "__PRESERVE_{}_TOKEN__"
 
@@ -103,7 +103,8 @@ class TextCleaner:
 
         # Build combined header/footer regex once (static across instances)
         if TextCleaner._combined_header_footer_regex is None:
-            # Wrap each pattern to match the full stripped line, ignoring case and optional whitespace
+           # Wrap each pattern to match the full stripped line,
+            # ignoring case and optional whitespace
             combined = '|'.join(
                 rf'(?:{p})' for p in self.HEADER_FOOTER_PATTERNS
             )
@@ -175,7 +176,7 @@ class TextCleaner:
     def extract_clean_sections(
         self,
         text: str,
-        section_markers: Optional[list[str]] = None
+        section_markers: list[str] | None = None
     ) -> dict[str, str]:
         """
         Extract and clean specific sections from a contract.

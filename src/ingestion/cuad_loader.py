@@ -7,7 +7,8 @@ Provides two loading strategies:
 """
 
 import json
-from typing import Any, Dict, Iterator, List
+from collections.abc import Iterator
+from typing import Any
 
 # Optional streaming dependency – install with: pip install ijson
 try:
@@ -32,7 +33,7 @@ class CUADLoader:
     # ------------------------------------------------------------------
     # Public methods
     # ------------------------------------------------------------------
-    def load(self, file_path: str) -> List[Dict[str, Any]]:
+    def load(self, file_path: str) -> list[dict[str, Any]]:
         """
         Load the CUAD JSON file fully into memory and flatten its structure.
 
@@ -75,7 +76,7 @@ class CUADLoader:
             if isinstance(paragraph, dict)
         ]
 
-    def load_stream(self, file_path: str) -> Iterator[Dict[str, Any]]:
+    def load_stream(self, file_path: str) -> Iterator[dict[str, Any]]:
         """
         Stream the CUAD JSON file using ijson – constant memory footprint.
 
