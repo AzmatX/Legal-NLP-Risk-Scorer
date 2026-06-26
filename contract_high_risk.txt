@@ -1,0 +1,19 @@
+MASTER SERVICE AGREEMENT
+
+ARTICLE 1: DEFINITIONS
+1.1 "Services" means the work described in Exhibit A.
+
+ARTICLE 2: PAYMENT TERMS
+Client shall pay Contractor the fees set forth in Exhibit B within thirty (30) days of receipt of an invoice.
+
+ARTICLE 3: CONFIDENTIALITY
+Recipient agrees to hold all Confidential Information in strict confidence and not to disclose it to any third party.
+
+ARTICLE 4: TERMINATION FOR CAUSE
+Either party may terminate this Agreement immediately upon written notice if the other party breaches any material term and fails to cure such breach within thirty (30) days.
+
+ARTICLE 5: INDEMNIFICATION
+Contractor shall indemnify, defend, and hold harmless Client from and against any claims arising out of Contractor's performance under this Agreement.
+
+ARTICLE 6: LIMITATION OF LIABILITY
+In no event shall either party be liable for indirect, incidental, or consequential damages. Total liability shall not exceed the fees paid.

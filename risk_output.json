@@ -1,0 +1,86 @@
+{
+  "risk_score": 100,
+  "risk_level": "high",
+  "risk_breakdown": [
+    {
+      "clause": "payment_terms",
+      "weight": 12,
+      "confidence": 0.95,
+      "contribution": 11.4
+    },
+    {
+      "clause": "confidentiality",
+      "weight": 5,
+      "confidence": 0.8,
+      "contribution": 4.0
+    },
+    {
+      "clause": "termination_for_cause",
+      "weight": 30,
+      "confidence": 0.8,
+      "contribution": 24.0
+    },
+    {
+      "clause": "indemnification",
+      "weight": 25,
+      "confidence": 0.95,
+      "contribution": 23.75
+    },
+    {
+      "clause": "limitation_of_liability",
+      "weight": 25,
+      "confidence": 0.65,
+      "contribution": 16.25
+    },
+    {
+      "clause": "force_majeure",
+      "weight": 15,
+      "confidence": 0.65,
+      "contribution": 9.75
+    },
+    {
+      "clause": "arbitration",
+      "weight": 15,
+      "confidence": 0.95,
+      "contribution": 14.25
+    },
+    {
+      "clause": "assignment",
+      "weight": 8,
+      "confidence": 0.8,
+      "contribution": 6.4
+    },
+    {
+      "clause": "non_compete",
+      "weight": 20,
+      "confidence": 0.65,
+      "contribution": 13.0
+    },
+    {
+      "clause": "insurance",
+      "weight": 10,
+      "confidence": 0.8,
+      "contribution": 8.0
+    },
+    {
+      "clause": "warranty",
+      "weight": 10,
+      "confidence": 0.8,
+      "contribution": 8.0
+    }
+  ],
+  "missing_clauses": [
+    "governing_law"
+  ],
+  "recommendations": [
+    "Add Governing Law clause",
+    "Review Termination For Cause obligations",
+    "Review Indemnification obligations",
+    "Review Limitation Of Liability obligations",
+    "Review Force Majeure obligations",
+    "Review Arbitration obligations",
+    "Review Non Compete obligations",
+    "Consider fine\u2011tuning classifier \u2013 1 clause(s) were not recognized"
+  ],
+  "unknown_clauses_count": 1
+}
