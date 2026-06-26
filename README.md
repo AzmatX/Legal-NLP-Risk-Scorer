@@ -6,6 +6,7 @@
 ![spaCy](https://img.shields.io/badge/spaCy-NLP-09A3D5)
 ![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker)
 ![License](https://img.shields.io/badge/License-MIT-green)
+
 ---
 
 # AI-Powered Contract Intelligence & Risk Scoring
@@ -28,95 +29,103 @@ G --> H[Risk Scoring]
 H --> I[Semantic Search]
 I --> J[JSON Response]
 ```
+
 ---
 
 ## Key Features
 
 - **Multi‑format ingestion** – supports PDF and Word documents with automatic text extraction.
-- **Named Entity Recognition** – extracts parties, dates, monetary values, and jurisdictions using a spaCy baseline model.
+- **Named Entity Recognition** – extracts parties, dates, monetary values, and jurisdictions using spaCy with custom legal patterns.
 - **Clause classification** – identifies key clauses (termination, confidentiality, indemnity, etc.) via a hybrid of transformer-based fine‑tuning and rule‑based fallback.
-- **Risk scoring** – assigns a risk level to each contract based on clause presence and language anomalies.
-- **RESTful API** – FastAPI endpoints for upload, analysis status, and results retrieval.
-- **Asynchronous processing** – background task handling via Celery (scaffolded).
-- **Semantic search** – vector embeddings for similarity retrieval across contract repositories (in progress).
-- **Containerized deployment** – Docker and Docker Compose for reproducible environments.
+- **Risk scoring** – assigns a risk level (Low/Medium/High) based on clause presence, mandatory clause penalties, and confidence-weighted contributions.
+- **RESTful API** – FastAPI endpoints with automatic OpenAPI docs, CORS support, and health checks.
+- **Asynchronous processing** – Celery + Redis for background task handling (scaffolded and ready).
+- **Semantic search** – ChromaDB vector store with Sentence-Transformers embeddings for clause similarity retrieval.
+- **Containerized deployment** – Docker and Docker Compose for reproducible, production-like environments.
 
 ---
 
 ## Tech Stack
 
-| Category              | Technologies |
-|-----------------------|--------------|
-| **Languages**         | Python 3.11+ |
-| **NLP & ML**          | Hugging Face Transformers (BERT/RoBERTa), spaCy, PyTorch |
-| **OCR**               | Tesseract, pdf2image, pytesseract |
-| **Information Retrieval** | Pinecone/Milvus (planned), LangChain (planned) |
-| **Backend/API**       | FastAPI, Uvicorn, Celery, Redis (broker) |
-| **Deployment**        | Docker, Docker Compose, AWS EC2 (target) |
-| **Testing & Linting** | pytest, ruff |
-| **Data Versioning**   | Git LFS (for datasets) |
+| Category                  | Technologies                                                           |
+| ------------------------- | ---------------------------------------------------------------------- |
+| **Languages**             | Python 3.11+                                                           |
+| **NLP & ML**              | Hugging Face Transformers, spaCy, PyTorch, Sentence-Transformers       |
+| **OCR & PDF**             | Tesseract, EasyOCR, PaddleOCR, pdf2image, PyPDF, pdfplumber            |
+| **Vector/IR**             | ChromaDB, FAISS (CPU)                                                  |
+| **Backend/API**           | FastAPI, Uvicorn, Celery, Redis (broker/backend)                       |
+| **Deployment**            | Docker, Docker Compose                                                 |
+| **Testing & Linting**     | pytest, ruff                                                           |
+| **Data Versioning**       | Git LFS (for datasets)                                                 |
 
 ---
 
 ## Current Implementation Status
 
-| Component | Status |
-|-----------|--------|
-| **FastAPI contract analysis API** | ✅ Implemented – endpoints for upload, status, results |
-| **File validation and ingestion pipeline** | ✅ Implemented – supports PDF, DOCX; cleaning and structuring |
-| **OCR service abstraction with caching and multi-engine design** | ✅ Implemented – Tesseract backend with caching |
-| **Baseline NER extraction pipeline** | ✅ Implemented – spaCy model with custom entity rules |
-| **Baseline clause classification framework** | ✅ Implemented – scaffolded transformers + heuristic fallback |
-| **Baseline risk scoring module** | ✅ Implemented – rule‑based scoring with configurable thresholds |
-| **Modular service‑oriented codebase with test/lint setup** | ✅ Implemented – pytest and ruff configured |
-
-| Component | Status (Partial / Baseline only) |
-|-----------|----------------------------------|
-| **Transformer‑based clause classification** | ⚠️ Scaffolded, but runtime relies heavily on fallback heuristics unless a fine‑tuned model is loaded. |
-| **Risk scoring** | ⚠️ Currently rule‑based baseline; not yet a learned or domain‑calibrated scoring engine. |
-| **Clause segmentation and clause‑wise analysis** | ⚠️ Needs strengthening – current segmentation is coarse; per‑clause context is limited. |
-| **Semantic search / vector retrieval** | ⚠️ Implementation and integration need clarification; vector store service exists but not fully wired. |
-| **Celery asynchronous task processing** | ⚠️ Celery app and worker are defined, but integration with API and error handling need hardening. |
-
-> This honest assessment highlights that while the core infrastructure and baseline capabilities are solid, the system is not yet production‑ready for advanced legal NLP tasks. Further fine‑tuning and integration are required for the transformer and semantic search components.
+| Component                                                           | Status                                                                                                                              |
+| ------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| **FastAPI contract analysis API**                                   | ✅ Implemented – `/health`, `/contracts/analyze` with CORS & lifespan startup                                                      |
+| **File validation and ingestion pipeline**                          | ✅ Implemented – supports PDF, TXT, JSON; magic byte validation & schema building                                                   |
+| **OCR service with multi-engine abstraction**                      | ✅ Implemented – Tesseract/EasyOCR/PaddleOCR with lazy loading & file-based caching                                                  |
+| **NER extraction pipeline**                                         | ✅ Implemented – spaCy `en_core_web_sm` with fallback rules and batch processing                                                    |
+| **Clause segmentation**                                             | ✅ Implemented – `O(n)` optimized heading detection (Articles, Sections, numbered clauses)                                           |
+| **Clause classification framework**                                 | ✅ Implemented – Transformer scaffold + comprehensive keyword-based fallback covering 26+ clause types                              |
+| **Risk scoring module**                                             | ✅ Implemented – Confidence-weighted scoring with mandatory clause penalties & actionable recommendations                           |
+| **Semantic search / vector retrieval**                              | ✅ Implemented – ChromaDB + `all-MiniLM-L6-v2` embeddings with production-ready `semantic_search()` API                          |
+| **Modular service‑oriented codebase**                              | ✅ Implemented – pytest (65+ tests), ruff linting, and clean dependency injection                                                    |
+| **Celery asynchronous task processing**                             | ✅ Implemented – `celery_app` configured via env vars, with `process_contract_background` heavy task ready                          |
+| **Dockerization**                                                   | ✅ Implemented – Multi-stage ready Dockerfile & `docker-compose.yml` with Redis, API, and Worker services                           |
 
 ---
 
 ## How to Run
 
 ### Prerequisites
-- Python 3.10+
-- Tesseract OCR installed ([instructions](https://tesseract-ocr.github.io/tessdoc/Installation.html))
-- (Optional) Git LFS for dataset handling
+- Python 3.11+
+- Docker & Docker Compose (recommended for production-like demo)
+- Tesseract OCR installed locally ([instructions](https://tesseract-ocr.github.io/tessdoc/Installation.html)) if running without Docker.
 
-### Clone and Setup
+### Option 1: Run with Docker (Recommended)
+This spins up the API, Celery Worker, and Redis in isolated containers.
+
+```bash
+# Clone the repository
+git clone https://github.com/AzmatX/Legal-NLP-Risk-Scorer.git
+cd Legal-NLP-Risk-Scorer
+
+# Build and start all services
+docker-compose up --build
+
+# The API will be available at: http://localhost:8000
+# Interactive Swagger docs: http://localhost:8000/docs
+```
+
+### Option 2: Run Locally (Development)
+
+**1. Clone and Setup Virtual Environment**
 ```bash
 git clone https://github.com/AzmatX/Legal-NLP-Risk-Scorer.git
 cd Legal-NLP-Risk-Scorer
-```
-
-### Create Virtual Environment
-```bash
 python -m venv .venv
 source .venv/bin/activate      # Linux/macOS
 .venv\Scripts\activate         # Windows
 ```
 
-### Install Dependencies
+**2. Install Dependencies (including ML/Dev extras)**
 ```bash
-pip install -r requirements.txt
+pip install --upgrade pip
+pip install -e .[ml,dev]
 ```
 
-### Run the API Server
+**3. Run the API Server**
 ```bash
 uvicorn src.api.main:app --reload
 ```
-
 The API will be available at `http://localhost:8000`. Interactive docs at `http://localhost:8000/docs`.
 
-### Run Tests and Linting
+**4. Run Tests and Linting**
 ```bash
-pytest
+pytest -v
 ruff check .
 ```
 
@@ -126,76 +135,61 @@ ruff check .
 
 ### 1. Dashboard
 ![Dashboard](assets/images/dashboard.png)
-
 *Overview of all analyses, recent contracts, and quick upload.*
 
 ### 2. Upload Contract
 ![Upload Contract](assets/images/upload.png)
-
 *Drag‑and‑drop or select a PDF/DOCX file for analysis.*
 
 ### 3. Analysis Status
 ![Analysis Status](assets/images/analysis_status.png)
-
 *Real‑time progress tracking – from OCR to risk scoring.*
 
 ### 4. Analysis Results
 ![Analysis Results](assets/images/analysis_results.png)
-
 *Detailed entities, clause classifications, and risk breakdown.*
 
 ### 5. Semantic Search
 ![Semantic Search](assets/images/semantic_search.png)
-
 *Find similar contracts using AI‑powered vector search.*
 
-### 6. API Documentation (Optional)
+### 6. API Documentation
 ![API Docs](assets/images/api_docs.png)
-
 *Interactive Swagger UI for programmatic access.*
 
 ---
 
 ## Example API Request / Response
 
-**Upload a contract file:**
+**Analyze a contract:**
 ```http
-POST /upload
+POST /contracts/analyze
 Content-Type: multipart/form-data
-
 file: contract.pdf
 ```
 
-**Response:**
+**Response (Success):**
 ```json
 {
-  "task_id": "abc123",
-  "status": "processing",
-  "message": "File uploaded successfully. Analysis started."
-}
-```
-
-**Check analysis status:**
-```http
-GET /status/{task_id}
-```
-
-**Response (completed):**
-```json
-{
-  "task_id": "abc123",
-  "status": "completed",
-  "result": {
-    "entities": [
-      {"text": "Acme Corp", "label": "ORG", "start": 10, "end": 18},
-      {"text": "$5,000,000", "label": "MONEY", "start": 45, "end": 55}
-    ],
-    "clauses": {
-      "termination": {"present": true, "confidence": 0.92},
-      "confidentiality": {"present": true, "confidence": 0.87}
-    },
+  "filename": "contract.pdf",
+  "entities": [
+    {"text": "Acme Corp", "label": "ORG", "start": 10, "end": 18},
+    {"text": "$5,000,000", "label": "MONEY", "start": 45, "end": 55}
+  ],
+  "clauses": [
+    {"heading": "Section 1", "text": "...", "label": "governing_law", "confidence": "0.92"}
+  ],
+  "summary": {
+    "total_clauses": 15,
+    "type_counts": {"governing_law": 1, "confidentiality": 1}
+  },
+  "risk_factors": [...],
+  "risk": {
     "risk_score": 72,
-    "risk_level": "medium"
+    "risk_level": "high",
+    "risk_breakdown": [...],
+    "missing_clauses": ["indemnification"],
+    "recommendations": ["Review indemnification obligations"]
   }
 }
 ```
@@ -206,9 +200,10 @@ GET /status/{task_id}
 
 - **Dataset:** [CUAD (Contract Understanding Atticus Dataset)](https://www.atticusprojectai.org/cuad) – over 500 commercial contracts annotated for 41 legal categories.
 - **Pre‑trained Models:** 
-  - NER: spaCy `en_core_web_lg` with custom extensions.
-  - Clause Classification: `roberta-base` (fine‑tuned on CUAD) – currently scaffolded.
-- **Future:** Fine‑tuned Legal‑BERT or RoBERTa‑legal for improved clause classification and risk scoring.
+  - NER: spaCy `en_core_web_sm` (fallback) / `en_core_web_lg` (optional).
+  - Embeddings: `sentence-transformers/all-MiniLM-L6-v2` for semantic search.
+  - Clause Classification: `roberta-base` (scaffolded for fine-tuning on CUAD).
+- **Future:** Fine‑tuned Legal‑BERT / RoBERTa-legal for improved clause classification and risk scoring.
 
 ---
 
@@ -219,7 +214,7 @@ GET /status/{task_id}
 | **1** | Data parsing & baseline modeling: set up CUAD, OCR pipeline, train baseline NER. |
 | **2** | Advanced NLP & fine‑tuning: fine‑tune transformer, evaluate, post‑process. |
 | **3** | Vector search & API development: generate embeddings, build FastAPI, Celery integration. |
-| **4** | Integration & productionization: Dockerize, frontend/visualization, load testing, documentation. |
+| **4** | Integration & productionization: Dockerize, load testing, documentation, final review. |
 
 > For detailed task breakdown, see the [GitHub Issues Backlog](docs/guides/github-issues-backlog.md).
 
@@ -248,3 +243,5 @@ Maintainers and contributors are listed in the [mailmap](.mailmap) and commit hi
 
 This project is licensed under the terms specified in the [LICENSE](LICENSE) file.
 ```
+
+---

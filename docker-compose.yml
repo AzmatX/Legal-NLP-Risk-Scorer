@@ -1,16 +1,30 @@
 services:
-  api:
-    build: .
-    ports:
-      - "8000:8000"
-    depends_on:
-      - redis
-  worker:
-    build: .
-    command: celery -A tasks.celery_app.celery_app worker --loglevel=info
-    depends_on:
-      - redis
   redis:
     image: redis:7-alpine
     ports:
       - "6379:6379"
+    restart: unless-stopped
+
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      # ⚠️ CRITICAL FIX: Localhost ki jagah service name "redis" use kar rahe hain.
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  worker:
+    build: .
+    command: celery -A tasks.celery_app.celery_app worker --loglevel=info
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - redis
+    restart: unless-stopped

@@ -23,34 +23,29 @@ class TextCleaner:
     """
 
     # Legal symbols and characters to preserve
+    # Legal symbols and characters to preserve
     LEGAL_SYMBOLS: set[str] = {
-        "§",
-        "¶",
-        "©",
-        "®",
-        "™",
-        "°",
-        "±",
-        "×",
-        "÷",
-        "$",
-        "€",
-        "£",
-        "¥",
-        "¢",
-        "%",
-        "&",
-        "@",
-        "#",
-        "—",
-        "–",
-        "…",
-        '"',
-        "'",
-        "`",
-        '"',
-    }
+    "§", "¶", "©", "®", "™",
+    "°", "±", "×", "÷",
 
+    "$", "€", "£", "¥", "¢",
+    "%", "&", "@", "#",
+
+    "—", "–", "…",
+
+    '"', "'", "`",
+
+    # Punctuation required for legal text parsing
+    ".", ",", ";", ":",
+
+    "(", ")", "[", "]", "{", "}",
+
+    "?", "!", "-", "_",
+
+    "/", "\\",
+
+    "=", "+", "<", ">",
+}
     # Common header/footer patterns to remove (as strings, will be combined)
     HEADER_FOOTER_PATTERNS = [
         r"Page\s+\d+\s*of\s*\d+",  # "Page X of Y"

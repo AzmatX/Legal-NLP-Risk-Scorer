@@ -25,13 +25,16 @@ DEFAULT_PATTERNS = {
         re.IGNORECASE | re.MULTILINE,
     ),
     "section": re.compile(
-        r"^(Section|Sect\.|§)\s+(\d+(?:\.\d+)*)\s*[-–:.]?\s*(.*)$", re.IGNORECASE | re.MULTILINE
+        r"^(Section|Sect\.|§)\s+(\d+(?:\.\d+)*)\s*[-–:.]?\s*(.*)$",
+        re.IGNORECASE | re.MULTILINE,
     ),
     "numbered": re.compile(
-        r"^(\d+(?:\.\d+)*|\w\)|[\(（]\w[\)）]|[IVXLCDM]+\.)\s+(.*)$", re.MULTILINE
+        r"^(\d+(?:\.\d+)*|\w\)|[\(（]\w[\)）]|[IVXLCDM]+\.)\s+(.*)$",
+        re.MULTILINE,
     ),
     "preamble": re.compile(
-        r"^(WHEREAS|NOW\s+THEREFORE|THEREFORE|WHEREFORE)\b", re.IGNORECASE | re.MULTILINE
+        r"^(WHEREAS|NOW\s+THEREFORE|THEREFORE|WHEREFORE)\b",
+        re.IGNORECASE | re.MULTILINE,
     ),
     "short_heading": re.compile(r"^([A-Z][A-Z\s]+[A-Z])\s*[:.]\s*(.*)$", re.MULTILINE),
 }
@@ -42,46 +45,69 @@ class ClauseSegmenter:
         self.patterns = patterns or DEFAULT_PATTERNS
 
     def segment(self, text: str) -> list[Clause]:
+        """Optimized O(n) segmentation using running character offset."""
         if not text or not text.strip():
             return []
 
         lines = text.splitlines(keepends=False)
-        clauses = []
+        clauses: list[Clause] = []
+
         current_heading = None
-        current_text_lines = []
+        current_text_lines: list[str] = []
         current_start = 0
         current_end = 0
 
-        i = 0
-        while i < len(lines):
-            line = lines[i]
+        # ✅ Running character offset prevents O(n²) repeated substring scans
+        global_pos = 0
+
+        for line in lines:
+            line_len = len(line)
+            line_start = global_pos
+            line_end = global_pos + line_len
+
             heading, is_heading = self._detect_heading(line)
+
             if is_heading:
                 if current_text_lines:
                     clauses.append(
                         self._build_clause(
-                            current_heading, current_text_lines, current_start, current_end
+                            current_heading,
+                            current_text_lines,
+                            current_start,
+                            current_end,
                         )
                     )
+
                 current_heading = heading
                 current_text_lines = [line]
-                current_start = self._get_line_start(text, i, lines)
-                current_end = self._get_line_end(text, i, lines)
+                current_start = line_start
+                current_end = line_end
+
             else:
                 if not current_text_lines:
+                    # Text starts without a heading
                     current_heading = None
                     current_text_lines = [line]
-                    current_start = self._get_line_start(text, i, lines)
-                    current_end = self._get_line_end(text, i, lines)
+                    current_start = line_start
+                    current_end = line_end
                 else:
                     current_text_lines.append(line)
-                    current_end = self._get_line_end(text, i, lines)
-            i += 1
+                    current_end = line_end
 
+            # splitlines() removes '\n' — add it back for accurate character offsets
+            global_pos += line_len + 1
+
+        # Last clause
         if current_text_lines:
             clauses.append(
-                self._build_clause(current_heading, current_text_lines, current_start, current_end)
+                self._build_clause(
+                    current_heading,
+                    current_text_lines,
+                    current_start,
+                    current_end,
+                )
             )
+
         return clauses
 
     def _detect_heading(self, line: str) -> tuple:
@@ -109,12 +135,18 @@ class ClauseSegmenter:
                 elif name == "short_heading":
                     return match.group(1), True
 
+        # Catch-all: all-uppercase short lines treated as headings
         if line_stripped.isupper() and len(line_stripped.split()) <= 10:
             return line_stripped, True
+
         return None, False
 
     def _build_clause(
-        self, heading: str | None, lines: list[str], start_char: int, end_char: int
+        self,
+        heading: str | None,
+        lines: list[str],
+        start_char: int,
+        end_char: int,
     ) -> Clause:
         text = "\n".join(lines)
         return Clause(
@@ -124,17 +156,9 @@ class ClauseSegmenter:
             end_char=end_char,
         )
 
-    def _get_line_start(self, full_text: str, line_idx: int, lines: list[str]) -> int:
-        if line_idx == 0:
-            return 0
-        prev_len = sum(len(line) + 1 for line in lines[:line_idx])
-        return prev_len
 
-    def _get_line_end(self, full_text: str, line_idx: int, lines: list[str]) -> int:
-        start = self._get_line_start(full_text, line_idx, lines)
-        return start + len(lines[line_idx])
-
-
+# ---------- Convenience function ----------
 def segment_contract(text: str) -> list[Clause]:
+    """Public API: segment a full contract into clauses."""
     segmenter = ClauseSegmenter()
     return segmenter.segment(text)

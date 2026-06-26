@@ -159,64 +159,49 @@ def tokenize_text_for_ner(
 ) -> list[dict[str, Any]]:
     """
     Split text into chunks suitable for NER model input.
-
-    Prefers spaCy for linguistically‑aware sentence boundaries; falls back
-    to a simple regex split if spaCy is unavailable.
-
-    Args:
-        text: Raw contract text.
-        max_length: Maximum tokens per chunk (approximate word count).
-        use_spacy: If True, use spaCy (when available) for sentence splitting.
-
-    Returns:
-        List of chunk dictionaries with keys:
-            - text: chunk text
-            - token_count: number of words in chunk
-            - sentence_count: number of sentences in chunk
     """
-    # Split sentences using the best available method
     if use_spacy and HAS_SPACY:
         doc = NLP(text)
         sentences = [sent.text.strip() for sent in doc.sents if sent.text.strip()]
     else:
-        # Fallback regex – improved pattern that preserves legal citations
         sentences = re.split(r'(?<=[.!?])\s+(?=[A-Z0-9"“])', text)
         sentences = [s.strip() for s in sentences if s.strip()]
 
     chunks = []
     current_chunk_words: list[str] = []
     current_length = 0
+    current_sentence_count = 0  # ✅ FIX: Track sentences properly
 
     for sentence in sentences:
         words = sentence.split()
         sentence_len = len(words)
 
         if current_length + sentence_len > max_length and current_chunk_words:
-            # Flush current chunk
             chunks.append(
                 {
                     "text": " ".join(current_chunk_words),
                     "token_count": current_length,
-                    "sentence_count": len(current_chunk_words),  # counts words in legacy logic
+                    "sentence_count": current_sentence_count,  # ✅ FIX: Correct count
                 }
             )
             current_chunk_words = []
             current_length = 0
+            current_sentence_count = 0
 
         current_chunk_words.extend(words)
         current_length += sentence_len
+        current_sentence_count += 1  # ✅ FIX: Increment per sentence
 
     if current_chunk_words:
         chunks.append(
             {
                 "text": " ".join(current_chunk_words),
                 "token_count": current_length,
-                "sentence_count": len(current_chunk_words),
+                "sentence_count": current_sentence_count,  # ✅ FIX
             }
         )
 
     return chunks
-
 
 def create_training_splits(
     input_dir: str,
