@@ -13,6 +13,7 @@ from typing import Any
 # Optional streaming dependency – install with: pip install ijson
 try:
     import ijson
+
     HAS_IJSON = True
 except ImportError:
     HAS_IJSON = False
@@ -53,15 +54,11 @@ class CUADLoader:
 
         # Validate top‑level structure
         if not isinstance(data, dict) or self.DATA_KEY not in data:
-            raise ValueError(
-                f"Invalid JSON format: expected dict with key '{self.DATA_KEY}'"
-            )
+            raise ValueError(f"Invalid JSON format: expected dict with key '{self.DATA_KEY}'")
 
         contracts_data = data[self.DATA_KEY]
         if not isinstance(contracts_data, list):
-            raise ValueError(
-                f"'{self.DATA_KEY}' must be a list, got {type(contracts_data)}"
-            )
+            raise ValueError(f"'{self.DATA_KEY}' must be a list, got {type(contracts_data)}")
 
         # Flatten using a list comprehension (fast and readable)
         return [
@@ -96,13 +93,12 @@ class CUADLoader:
         """
         if not HAS_IJSON:
             raise ImportError(
-                "The ijson library is required for streaming. "
-                "Install it with: pip install ijson"
+                "The ijson library is required for streaming. Install it with: pip install ijson"
             )
 
-        with open(file_path, 'rb') as f:
+        with open(file_path, "rb") as f:
             # ijson.items parses the "data" array item by item
-            for contract in ijson.items(f, 'data.item'):
+            for contract in ijson.items(f, "data.item"):
                 title = contract[self.TITLE_KEY]
 
                 # Paragraphs can be missing – safely iterate

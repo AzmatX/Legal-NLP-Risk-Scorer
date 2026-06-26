@@ -56,9 +56,7 @@ class ContractProcessor:
         """
         # Guard against non‑string input
         if not isinstance(text, str):
-            raise TypeError(
-                f"Expected string for 'text', got {type(text).__name__}"
-            )
+            raise TypeError(f"Expected string for 'text', got {type(text).__name__}")
 
         # Validate (raises on failure)
         self.validator.validate(file_name, text)
@@ -67,11 +65,6 @@ class ContractProcessor:
         cleaned_text = self.cleaner.clean(text)
 
         # Create structured data (entities & clauses to be populated later)
-        structured = ContractSchema(
-            file_name=file_name,
-            text=cleaned_text,
-            entities={},
-            clauses={}
-        )
+        structured = ContractSchema(file_name=file_name, text=cleaned_text, entities={}, clauses={})
 
         return structured.to_dict()

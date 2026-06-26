@@ -2,13 +2,14 @@
 Clause segmentation service.
 Splits contract text into individual clauses based on headings, numbering, and legal patterns.
 """
+
 import re
 from dataclasses import dataclass
-from typing import List, Optional, Pattern
+
 
 @dataclass
 class Clause:
-    heading: Optional[str]
+    heading: str | None
     text: str
     start_char: int
     end_char: int
@@ -20,33 +21,27 @@ class Clause:
 
 DEFAULT_PATTERNS = {
     "article": re.compile(
-        r'^(ARTICLE|ART)\s+([IVXLCDM]+|\d+(?:\.\d+)*)\s*[-–:.]?\s*(.*)$',
-        re.IGNORECASE | re.MULTILINE
+        r"^(ARTICLE|ART)\s+([IVXLCDM]+|\d+(?:\.\d+)*)\s*[-–:.]?\s*(.*)$",
+        re.IGNORECASE | re.MULTILINE,
     ),
     "section": re.compile(
-        r'^(Section|Sect\.|§)\s+(\d+(?:\.\d+)*)\s*[-–:.]?\s*(.*)$',
-        re.IGNORECASE | re.MULTILINE
+        r"^(Section|Sect\.|§)\s+(\d+(?:\.\d+)*)\s*[-–:.]?\s*(.*)$", re.IGNORECASE | re.MULTILINE
     ),
     "numbered": re.compile(
-        r'^(\d+(?:\.\d+)*|\w\)|[\(（]\w[\)）]|[IVXLCDM]+\.)\s+(.*)$',
-        re.MULTILINE
+        r"^(\d+(?:\.\d+)*|\w\)|[\(（]\w[\)）]|[IVXLCDM]+\.)\s+(.*)$", re.MULTILINE
     ),
     "preamble": re.compile(
-        r'^(WHEREAS|NOW\s+THEREFORE|THEREFORE|WHEREFORE)\b',
-        re.IGNORECASE | re.MULTILINE
+        r"^(WHEREAS|NOW\s+THEREFORE|THEREFORE|WHEREFORE)\b", re.IGNORECASE | re.MULTILINE
     ),
-    "short_heading": re.compile(
-        r'^([A-Z][A-Z\s]+[A-Z])\s*[:.]\s*(.*)$',
-        re.MULTILINE
-    ),
+    "short_heading": re.compile(r"^([A-Z][A-Z\s]+[A-Z])\s*[:.]\s*(.*)$", re.MULTILINE),
 }
 
 
 class ClauseSegmenter:
-    def __init__(self, patterns: Optional[dict] = None):
+    def __init__(self, patterns: dict | None = None):
         self.patterns = patterns or DEFAULT_PATTERNS
 
-    def segment(self, text: str) -> List[Clause]:
+    def segment(self, text: str) -> list[Clause]:
         if not text or not text.strip():
             return []
 
@@ -63,12 +58,11 @@ class ClauseSegmenter:
             heading, is_heading = self._detect_heading(line)
             if is_heading:
                 if current_text_lines:
-                    clauses.append(self._build_clause(
-                        current_heading,
-                        current_text_lines,
-                        current_start,
-                        current_end
-                    ))
+                    clauses.append(
+                        self._build_clause(
+                            current_heading, current_text_lines, current_start, current_end
+                        )
+                    )
                 current_heading = heading
                 current_text_lines = [line]
                 current_start = self._get_line_start(text, i, lines)
@@ -85,12 +79,9 @@ class ClauseSegmenter:
             i += 1
 
         if current_text_lines:
-            clauses.append(self._build_clause(
-                current_heading,
-                current_text_lines,
-                current_start,
-                current_end
-            ))
+            clauses.append(
+                self._build_clause(current_heading, current_text_lines, current_start, current_end)
+            )
         return clauses
 
     def _detect_heading(self, line: str) -> tuple:
@@ -122,8 +113,9 @@ class ClauseSegmenter:
             return line_stripped, True
         return None, False
 
-    def _build_clause(self, heading: Optional[str], lines: List[str],
-                      start_char: int, end_char: int) -> Clause:
+    def _build_clause(
+        self, heading: str | None, lines: list[str], start_char: int, end_char: int
+    ) -> Clause:
         text = "\n".join(lines)
         return Clause(
             heading=heading,
@@ -132,17 +124,17 @@ class ClauseSegmenter:
             end_char=end_char,
         )
 
-    def _get_line_start(self, full_text: str, line_idx: int, lines: List[str]) -> int:
+    def _get_line_start(self, full_text: str, line_idx: int, lines: list[str]) -> int:
         if line_idx == 0:
             return 0
-        prev_len = sum(len(l) + 1 for l in lines[:line_idx])
+        prev_len = sum(len(line) + 1 for line in lines[:line_idx])
         return prev_len
 
-    def _get_line_end(self, full_text: str, line_idx: int, lines: List[str]) -> int:
+    def _get_line_end(self, full_text: str, line_idx: int, lines: list[str]) -> int:
         start = self._get_line_start(full_text, line_idx, lines)
         return start + len(lines[line_idx])
 
 
-def segment_contract(text: str) -> List[Clause]:
+def segment_contract(text: str) -> list[Clause]:
     segmenter = ClauseSegmenter()
     return segmenter.segment(text)

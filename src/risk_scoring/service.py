@@ -1,16 +1,16 @@
 """
 Risk Scoring Service
+
 Computes contract risk using clause presence, confidence weighting,
 mandatory clause penalties, and generates actionable recommendations.
 """
 
-from typing import Dict, Any, List, Set
-import re
+from typing import Any
 
 # -----------------------------------------------
 # 1. Risk weights per clause type (0–30 scale)
 # -----------------------------------------------
-RISK_WEIGHTS: Dict[str, int] = {
+RISK_WEIGHTS: dict[str, int] = {
     "termination_for_cause": 30,
     "indemnification": 25,
     "limitation_of_liability": 25,
@@ -31,7 +31,7 @@ RISK_WEIGHTS: Dict[str, int] = {
 # -----------------------------------------------
 # 2. Mandatory clauses – missing ones incur penalties
 # -----------------------------------------------
-MANDATORY_CLAUSES: Set[str] = {
+MANDATORY_CLAUSES: set[str] = {
     "confidentiality",
     "governing_law",
     "payment_terms",
@@ -41,40 +41,46 @@ MANDATORY_CLAUSES: Set[str] = {
 # -----------------------------------------------
 # 3. Thresholds for recommendations
 # -----------------------------------------------
-HIGH_RISK_WEIGHT_THRESHOLD = 15   # clauses with weight above this will trigger a "review" recommendation
+HIGH_RISK_WEIGHT_THRESHOLD = 15
 
-def score_contract(clause_result: Dict[str, Any]) -> Dict[str, Any]:
+
+def score_contract(clause_result: dict[str, Any]) -> dict[str, Any]:
     """
-    Computes a comprehensive risk assessment from the output of classify_contract().
+    Compute a comprehensive contract risk assessment.
 
     Args:
-        clause_result: dict with keys 'clauses' (list of per-clause dicts with label and confidence),
-                       'summary' (type_counts), 'risk_factors', etc.
+        clause_result:
+            Dictionary containing:
+            - clauses (per-clause labels and confidence scores)
+            - summary (type_counts)
+            - risk_factors
 
     Returns:
-        dict with:
-        - risk_score: int (0–100)
-        - risk_level: 'low' | 'medium' | 'high'
-        - risk_breakdown: list of dicts with clause, weight, confidence, contribution
-        - missing_clauses: list of mandatory clauses not found
-        - recommendations: list of actionable suggestions
-        - unknown_clauses_count: int
+        Dictionary containing:
+        - risk_score (0–100)
+        - risk_level
+        - risk_breakdown
+        - missing_clauses
+        - recommendations
+        - unknown_clauses_count
     """
+
     clauses = clause_result.get("clauses", [])
     type_counts = clause_result.get("summary", {}).get("type_counts", {})
 
-    # Prepare a mapping of clause label -> list of confidences (if multiple occurrences)
-    detected_labels = {}
+    # Map each clause label to its confidence values
+    detected_labels: dict[str, list[float]] = {}
+
     for clause in clauses:
         label = clause.get("label", "unknown")
         conf_str = clause.get("confidence", "0.00")
+
         try:
             conf = float(conf_str)
         except ValueError:
             conf = 0.0
-        if label not in detected_labels:
-            detected_labels[label] = []
-        detected_labels[label].append(conf)
+
+        detected_labels.setdefault(label, []).append(conf)
 
     # -----------------------------------------------
     # A. Weighted score with confidence
@@ -84,25 +90,33 @@ def score_contract(clause_result: Dict[str, Any]) -> Dict[str, Any]:
 
     for label, confs in detected_labels.items():
         weight = RISK_WEIGHTS.get(label, 0)
+
         if weight == 0:
-            continue  # ignore unknown for scoring (but we count them later)
-        # Use average confidence if multiple occurrences, or max? We'll use max to avoid diluting risk.
-        avg_conf = sum(confs) / len(confs)
-        contribution = weight * avg_conf
+            continue
+
+        # Use the maximum confidence to avoid
+        # diluting the calculated risk score.
+        max_conf = max(confs)
+
+        contribution = weight * max_conf
         total_weighted_score += contribution
-        risk_breakdown.append({
-            "clause": label,
-            "weight": weight,
-            "confidence": round(avg_conf, 2),
-            "contribution": round(contribution, 2),
-        })
+
+        risk_breakdown.append(
+            {
+                "clause": label,
+                "weight": weight,
+                "confidence": round(max_conf, 2),
+                "contribution": round(contribution, 2),
+            }
+        )
 
     # -----------------------------------------------
     # B. Missing mandatory clause penalties
     # -----------------------------------------------
     detected_set = set(detected_labels.keys())
     missing = MANDATORY_CLAUSES - detected_set
-    missing_penalty = len(missing) * 10   # +10 per missing clause
+
+    missing_penalty = len(missing) * 10
     total_weighted_score += missing_penalty
 
     # -----------------------------------------------
@@ -123,21 +137,26 @@ def score_contract(clause_result: Dict[str, Any]) -> Dict[str, Any]:
     # -----------------------------------------------
     # E. Generate recommendations
     # -----------------------------------------------
-    recommendations = []
+    recommendations: list[str] = []
 
-    # 1. Missing mandatory clauses
     for clause in missing:
-        recommendations.append(f"Add {clause.replace('_', ' ').title()} clause")
+        recommendations.append(
+            f"Add {clause.replace('_', ' ').title()} clause"
+        )
 
-    # 2. High-risk detected clauses (weight > threshold)
     for item in risk_breakdown:
         if item["weight"] >= HIGH_RISK_WEIGHT_THRESHOLD:
-            recommendations.append(f"Review {item['clause'].replace('_', ' ').title()} obligations")
+            recommendations.append(
+                f"Review {item['clause'].replace('_', ' ').title()} obligations"
+            )
 
-    # 3. If many unknown clauses, suggest model improvement
     unknown_count = type_counts.get("unknown", 0)
+
     if unknown_count > 0:
-        recommendations.append(f"Consider fine‑tuning classifier – {unknown_count} clause(s) were not recognized")
+        recommendations.append(
+            "Consider fine-tuning classifier because "
+            f"{unknown_count} clause(s) were not recognized."
+        )
 
     # -----------------------------------------------
     # F. Final result

@@ -15,6 +15,7 @@ from typing import Any
 # Optional dependency for better sentence splitting
 try:
     import spacy
+
     NLP = spacy.load("en_core_web_sm", disable=["ner", "lemmatizer"])
     HAS_SPACY = True
 except ImportError:
@@ -32,6 +33,7 @@ DEFAULT_RANDOM_SEED: int = 42
 # ------------------------------------------------------------------
 # Public API
 # ------------------------------------------------------------------
+
 
 def validate_contract_file(file_name: str) -> None:
     """
@@ -191,11 +193,13 @@ def tokenize_text_for_ner(
 
         if current_length + sentence_len > max_length and current_chunk_words:
             # Flush current chunk
-            chunks.append({
-                "text": " ".join(current_chunk_words),
-                "token_count": current_length,
-                "sentence_count": len(current_chunk_words),  # counts words in legacy logic
-})
+            chunks.append(
+                {
+                    "text": " ".join(current_chunk_words),
+                    "token_count": current_length,
+                    "sentence_count": len(current_chunk_words),  # counts words in legacy logic
+                }
+            )
             current_chunk_words = []
             current_length = 0
 
@@ -207,7 +211,7 @@ def tokenize_text_for_ner(
             {
                 "text": " ".join(current_chunk_words),
                 "token_count": current_length,
-                "sentence_count": len(current_chunk_words)
+                "sentence_count": len(current_chunk_words),
             }
         )
 

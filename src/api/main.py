@@ -6,7 +6,6 @@ from src.ner.service import extract_legal_entities
 from src.ocr.service import extract_text_from_document
 from src.risk_scoring.service import score_contract
 from src.utils.config import settings
-from src.vector_store.service import semantic_search
 
 app = FastAPI(title=settings.app_name, version=settings.app_version)
 
@@ -44,5 +43,5 @@ async def analyze_contract(file: UploadFile = File(...)) -> dict[str, object]:
         "clauses": clause_result["clauses"],
         "summary": clause_result["summary"],
         "risk_factors": clause_result["risk_factors"],
-        "risk": risk_assessment,               # includes score, level, breakdown, missing, recommendations
+        "risk": risk_assessment,  # includes score, level, breakdown, missing, recommendations
     }

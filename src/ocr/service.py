@@ -46,7 +46,7 @@ class OCRCache:
 
         if cache_file.exists():
             try:
-                with open(cache_file, encoding='utf-8') as f:
+                with open(cache_file, encoding="utf-8") as f:
                     result = json.load(f)
                     logger.debug(f"Cache hit for {cache_key[:16]}")
                     return result
@@ -64,7 +64,7 @@ class OCRCache:
         cache_file = self._get_cache_path(cache_key)
 
         try:
-            with open(cache_file, 'w', encoding='utf-8') as f:
+            with open(cache_file, "w", encoding="utf-8") as f:
                 json.dump(result, f, indent=2)
             logger.debug(f"Cached result for {cache_key[:16]}")
         except Exception as e:
@@ -105,7 +105,7 @@ class OptimizedOCRProcessor:
         preferred_engine: str = "auto",
         max_workers: int = 4,
         dpi: int = 300,
-        use_cache: bool = True
+        use_cache: bool = True,
     ):
         """
         Initialize the optimized OCR processor.
@@ -134,6 +134,7 @@ class OptimizedOCRProcessor:
         # Check Tesseract
         try:
             import pytesseract
+
             pytesseract.get_tesseract_version()
             self.tesseract_available = True
             logger.info("Tesseract OCR available")
@@ -177,10 +178,7 @@ class OptimizedOCRProcessor:
             return "none"
 
     def extract_text_from_document(
-        self,
-        file_source: str | bytes | Path,
-        is_file_path: bool = True,
-        use_parallel: bool = True
+        self, file_source: str | bytes | Path, is_file_path: bool = True, use_parallel: bool = True
     ) -> dict[str, Any]:
         """
         Extract text from PDF documents using optimized OCR.
@@ -201,15 +199,15 @@ class OptimizedOCRProcessor:
         """
         start_time = time.time()
         result = {
-            'full_text': '',
-            'pages': [],
-            'page_count': 0,
-            'source': str(file_source) if isinstance(file_source, (str, Path)) else 'bytes',
-            'success': False,
-            'error': None,
-            'processing_time': 0.0,
-            'engine_used': 'none',
-            'cache_hit': False
+            "full_text": "",
+            "pages": [],
+            "page_count": 0,
+            "source": str(file_source) if isinstance(file_source, (str, Path)) else "bytes",
+            "success": False,
+            "error": None,
+            "processing_time": 0.0,
+            "engine_used": "none",
+            "cache_hit": False,
         }
 
         try:
@@ -220,7 +218,7 @@ class OptimizedOCRProcessor:
                     raise FileNotFoundError(f"Document not found: {file_source}")
 
                 logger.info(f"Processing PDF from file: {path.name}")
-                with open(path, 'rb') as f:
+                with open(path, "rb") as f:
                     raw_bytes = f.read()
             else:
                 raw_bytes = file_source
@@ -233,21 +231,21 @@ class OptimizedOCRProcessor:
             if self.use_cache:
                 cached_result = ocr_cache.get(raw_bytes)
                 if cached_result:
-                    cached_result['cache_hit'] = True
+                    cached_result["cache_hit"] = True
                     logger.info("Returning cached OCR result")
                     return cached_result
 
             # Check if pdf2image is available
             if not self.pdf2image_available:
-                result['full_text'] = (
-                    "OCR_NOT_AVAILABLE: Install pdf2image for PDF processing. "
-                    "pip install pdf2image"
+                result["full_text"] = (
+                    "OCR_NOT_AVAILABLE: Install pdf2image for PDF processing. pip install pdf2image"
                 )
-                result['success'] = True
+                result["success"] = True
                 return result
 
             # Convert PDF pages to images
             from pdf2image import convert_from_bytes
+
             logger.info(f"Converting PDF to images at {self.dpi} DPI")
 
             images = convert_from_bytes(raw_bytes, dpi=self.dpi)
@@ -256,14 +254,14 @@ class OptimizedOCRProcessor:
 
             # Select OCR engine
             engine = self._select_engine()
-            result['engine_used'] = engine
+            result["engine_used"] = engine
 
             if engine == "none":
-                result['full_text'] = (
+                result["full_text"] = (
                     "OCR_NOT_AVAILABLE: No OCR engines available. "
                     "Install one of: pytesseract, easyocr, or paddleocr"
                 )
-                result['success'] = True
+                result["success"] = True
                 return result
 
             # Process pages
@@ -272,49 +270,40 @@ class OptimizedOCRProcessor:
             else:
                 extracted_pages = self._process_pages_sequential(images, engine)
 
-            result['pages'] = extracted_pages
-            result['full_text'] = "\n\n".join(extracted_pages)
-            result['page_count'] = page_count
-            result['success'] = True
+            result["pages"] = extracted_pages
+            result["full_text"] = "\n\n".join(extracted_pages)
+            result["page_count"] = page_count
+            result["success"] = True
 
             # Cache result
             if self.use_cache:
                 ocr_cache.set(raw_bytes, result)
 
-            result['processing_time'] = time.time() - start_time
+            result["processing_time"] = time.time() - start_time
             logger.info(
                 f"Successfully extracted text from {page_count} pages "
                 f"in {result['processing_time']:.2f}s using {engine}"
             )
 
         except FileNotFoundError:
-            result['error'] = f"File not found: {file_source}"
-            logger.error(result['error'])
+            result["error"] = f"File not found: {file_source}"
+            logger.error(result["error"])
             raise
         except Exception as e:
-            result['error'] = f"OCR processing failed: {str(e)}"
-            result['processing_time'] = time.time() - start_time
-            logger.error(result['error'])
-            raise ValueError(result['error']) from e
+            result["error"] = f"OCR processing failed: {str(e)}"
+            result["processing_time"] = time.time() - start_time
+            logger.error(result["error"])
+            raise ValueError(result["error"]) from e
 
         return result
 
-    def _process_pages_parallel(
-        self,
-        images: list,
-        engine: str
-    ) -> list[str]:
+    def _process_pages_parallel(self, images: list, engine: str) -> list[str]:
         """Process PDF pages in parallel using thread pool."""
         extracted_pages = [None] * len(images)
 
         with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
             future_to_page = {
-                executor.submit(
-                    self._process_single_page,
-                    img,
-                    engine,
-                    i
-                ): i
+                executor.submit(self._process_single_page, img, engine, i): i
                 for i, img in enumerate(images)
             }
 
@@ -330,27 +319,18 @@ class OptimizedOCRProcessor:
 
         return extracted_pages
 
-    def _process_pages_sequential(
-        self,
-        images: list,
-        engine: str
-    ) -> list[str]:
+    def _process_pages_sequential(self, images: list, engine: str) -> list[str]:
         """Process PDF pages sequentially."""
         extracted_pages = []
 
         for i, image in enumerate(images):
-            logger.debug(f"Processing page {i+1}/{len(images)}")
+            logger.debug(f"Processing page {i + 1}/{len(images)}")
             page_text = self._process_single_page(image, engine, i)
             extracted_pages.append(page_text)
 
         return extracted_pages
 
-    def _process_single_page(
-        self,
-        image: Any,
-        engine: str,
-        page_idx: int = 0
-    ) -> str:
+    def _process_single_page(self, image: Any, engine: str, page_idx: int = 0) -> str:
         """Process a single page with specified OCR engine."""
         if engine == "tesseract":
             return self._ocr_with_tesseract(image)
@@ -366,7 +346,7 @@ class OptimizedOCRProcessor:
         import pytesseract
 
         # Configure for better accuracy on documents
-        custom_config = r'--oem 3 --psm 6'
+        custom_config = r"--oem 3 --psm 6"
         text = pytesseract.image_to_string(image, config=custom_config)
         return text.strip()
 
@@ -375,14 +355,14 @@ class OptimizedOCRProcessor:
         import easyocr
 
         # Initialize reader (should be done once in production)
-        reader = easyocr.Reader(['en'], gpu=False, verbose=False)
+        reader = easyocr.Reader(["en"], gpu=False, verbose=False)
 
         # Get OCR results
         results = reader.readtext(image)
 
         # Extract text from results
         texts = [result[1] for result in results]
-        return '\n'.join(texts)
+        return "\n".join(texts)
 
     def _ocr_with_paddleocr(self, image: Any) -> str:
         """Extract text using PaddleOCR."""
@@ -390,7 +370,7 @@ class OptimizedOCRProcessor:
         from paddleocr import PaddleOCR
 
         # Initialize OCR (should be done once in production)
-        ocr = PaddleOCR(use_angle_cls=True, lang='en', show_log=False)
+        ocr = PaddleOCR(use_angle_cls=True, lang="en", show_log=False)
 
         # Convert PIL image to numpy array
         img_array = np.array(image)
@@ -404,7 +384,7 @@ class OptimizedOCRProcessor:
             for line in result[0]:
                 texts.append(line[1][0])
 
-        return '\n'.join(texts)
+        return "\n".join(texts)
 
 
 # Legacy function wrappers for backward compatibility
@@ -420,9 +400,7 @@ def _get_default_processor() -> OptimizedOCRProcessor:
 
 
 def extract_text_from_document(
-    file_source: str | bytes | Path,
-    is_file_path: bool = True,
-    dpi: int = 300
+    file_source: str | bytes | Path, is_file_path: bool = True, dpi: int = 300
 ) -> dict[str, str | list[str] | int]:
     """
     Extract text from PDF documents using OCR (legacy API).
@@ -441,16 +419,12 @@ def extract_text_from_document(
     processor = _get_default_processor()
     processor.dpi = dpi
     return processor.extract_text_from_document(
-        file_source,
-        is_file_path=is_file_path,
-        use_parallel=True
+        file_source, is_file_path=is_file_path, use_parallel=True
     )
 
 
 def extract_text_from_image(
-    image_source: str | bytes | Path,
-    lang: str = "eng",
-    is_file_path: bool = True
+    image_source: str | bytes | Path, lang: str = "eng", is_file_path: bool = True
 ) -> str:
     """
     Extract text from an image file using OCR (legacy API).
@@ -477,6 +451,7 @@ def extract_text_from_image(
         # Use Tesseract as default for single images
         if processor.tesseract_available:
             import pytesseract
+
             return pytesseract.image_to_string(image, lang=lang)
         else:
             return "OCR_NOT_AVAILABLE: Install pytesseract for image OCR"
@@ -487,9 +462,7 @@ def extract_text_from_image(
 
 
 def batch_process_documents(
-    file_paths: list[str | Path],
-    output_dir: str | None = None,
-    use_parallel: bool = True
+    file_paths: list[str | Path], output_dir: str | None = None, use_parallel: bool = True
 ) -> dict[str, int | list[dict]]:
     """
     Process multiple documents in batch (legacy API).
@@ -503,30 +476,18 @@ def batch_process_documents(
         Dictionary with processing results
     """
     processor = _get_default_processor()
-    results = {
-        'total_processed': 0,
-        'total_failed': 0,
-        'results': []
-    }
+    results = {"total_processed": 0, "total_failed": 0, "results": []}
 
     def process_single_file(file_path):
         try:
             result = processor.extract_text_from_document(
                 file_path,
                 is_file_path=True,
-                use_parallel=False  # Each doc processed sequentially
+                use_parallel=False,  # Each doc processed sequentially
             )
-            return {
-                'file': str(file_path),
-                'success': True,
-                'data': result
-            }
+            return {"file": str(file_path), "success": True, "data": result}
         except Exception as e:
-            return {
-                'file': str(file_path),
-                'success': False,
-                'error': str(e)
-            }
+            return {"file": str(file_path), "success": False, "error": str(e)}
 
     if use_parallel and len(file_paths) > 1:
         with ThreadPoolExecutor(max_workers=processor.max_workers) as executor:
@@ -534,29 +495,29 @@ def batch_process_documents(
 
             for future in as_completed(futures):
                 file_result = future.result()
-                results['results'].append(file_result)
+                results["results"].append(file_result)
 
-                if file_result['success']:
-                    results['total_processed'] += 1
+                if file_result["success"]:
+                    results["total_processed"] += 1
 
                     # Save to output directory if specified
-                    if output_dir and file_result['data']['success']:
+                    if output_dir and file_result["data"]["success"]:
                         output_path = Path(output_dir)
                         output_path.mkdir(parents=True, exist_ok=True)
                         output_file = output_path / f"{Path(file_result['file']).stem}_ocr.txt"
-                        with open(output_file, 'w', encoding='utf-8') as f:
-                            f.write(file_result['data']['full_text'])
+                        with open(output_file, "w", encoding="utf-8") as f:
+                            f.write(file_result["data"]["full_text"])
                 else:
-                    results['total_failed'] += 1
+                    results["total_failed"] += 1
     else:
         for file_path in file_paths:
             file_result = process_single_file(file_path)
-            results['results'].append(file_result)
+            results["results"].append(file_result)
 
-            if file_result['success']:
-                results['total_processed'] += 1
+            if file_result["success"]:
+                results["total_processed"] += 1
             else:
-                results['total_failed'] += 1
+                results["total_failed"] += 1
 
     logger.info(
         f"Batch processing complete: {results['total_processed']} succeeded, "

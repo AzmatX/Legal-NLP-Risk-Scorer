@@ -9,10 +9,10 @@ rare_labels = [
     "Third Party Beneficiary",
     "No-Solicit Of Customers",
     "Non-Disparagement",
-    "Joint Ip Ownership"
+    "Joint Ip Ownership",
 ]
 
-with open("data/CUADv1.json", "r", encoding="utf-8") as f:
+with open("data/CUADv1.json", encoding="utf-8") as f:
     data = json.load(f)
 
 found = {label: [] for label in rare_labels}

@@ -1,7 +1,9 @@
 """
 Test the full contract intelligence pipeline with a generated sample contract.
 """
+
 import json
+
 from src.clause_classifier import classify_contract
 from src.risk_scoring.service import score_contract
 
@@ -108,22 +110,24 @@ def main():
     print(f"🏷️  Risk Level: {risk['risk_level'].upper()}")
 
     print("\n📌 Risk Breakdown (weighted by confidence):")
-    for item in risk['risk_breakdown']:
-        clause_name = item['clause'].replace('_', ' ').title()
-        print(f"   • {clause_name:25} | weight: {item['weight']:2} | "
-              f"conf: {item['confidence']:.2f} | contrib: {item['contribution']:.2f}")
+    for item in risk["risk_breakdown"]:
+        clause_name = item["clause"].replace("_", " ").title()
+        print(
+            f"   • {clause_name:25} | weight: {item['weight']:2} | "
+            f"conf: {item['confidence']:.2f} | contrib: {item['contribution']:.2f}"
+        )
 
-    if risk['missing_clauses']:
+    if risk["missing_clauses"]:
         print("\n⚠️  MISSING MANDATORY CLAUSES:")
-        for clause in risk['missing_clauses']:
+        for clause in risk["missing_clauses"]:
             print(f"   • {clause.replace('_', ' ').title()}")
 
-    if risk['recommendations']:
+    if risk["recommendations"]:
         print("\n💡 RECOMMENDATIONS:")
-        for rec in risk['recommendations']:
+        for rec in risk["recommendations"]:
             print(f"   ✓ {rec}")
 
-    if risk['unknown_clauses_count'] > 0:
+    if risk["unknown_clauses_count"] > 0:
         print(f"\n❓ Unknown clauses detected: {risk['unknown_clauses_count']}")
 
     # Optional: Save the full JSON output to a file

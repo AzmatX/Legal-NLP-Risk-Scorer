@@ -24,42 +24,91 @@ class TextCleaner:
 
     # Legal symbols and characters to preserve
     LEGAL_SYMBOLS: set[str] = {
-        '§', '¶', '©', '®', '™', '°', '±', '×', '÷',
-        '$', '€', '£', '¥', '¢', '%', '&', '@', '#',
-        '—', '–', '…', '"', "'", '`', '"'
+        "§",
+        "¶",
+        "©",
+        "®",
+        "™",
+        "°",
+        "±",
+        "×",
+        "÷",
+        "$",
+        "€",
+        "£",
+        "¥",
+        "¢",
+        "%",
+        "&",
+        "@",
+        "#",
+        "—",
+        "–",
+        "…",
+        '"',
+        "'",
+        "`",
+        '"',
     }
 
     # Common header/footer patterns to remove (as strings, will be combined)
     HEADER_FOOTER_PATTERNS = [
-        r'Page\s+\d+\s*of\s*\d+',            # "Page X of Y"
-        r'\d+\s*of\s*\d+',                   # "X of Y"
-        r'Page\s+\d+',                       # "Page X"
-        r'CONFIDENTIAL.*?',                  # Confidential watermarks
-        r'DRAFT.*?',                         # Draft watermarks
-        r'ATTORNEY\s+CLIENT\s+PRIVILEGED.*?',# Privilege notices
-        r'WORK\s+PRODUCT.*?',               # Work product notices
-        r'©\s+\d{4}.*?',                     # Copyright lines
-        r'All\s+Rights\s+Reserved.*?',       # Rights reserved
+        r"Page\s+\d+\s*of\s*\d+",  # "Page X of Y"
+        r"\d+\s*of\s*\d+",  # "X of Y"
+        r"Page\s+\d+",  # "Page X"
+        r"CONFIDENTIAL.*?",  # Confidential watermarks
+        r"DRAFT.*?",  # Draft watermarks
+        r"ATTORNEY\s+CLIENT\s+PRIVILEGED.*?",  # Privilege notices
+        r"WORK\s+PRODUCT.*?",  # Work product notices
+        r"©\s+\d{4}.*?",  # Copyright lines
+        r"All\s+Rights\s+Reserved.*?",  # Rights reserved
     ]
 
     # Patterns to normalize but not remove
     NORMALIZE_PATTERNS: dict[str, str] = {
-        r'\n{3,}': '\n\n',            # Multiple newlines to double
-        r' {2,}': ' ',               # Multiple spaces to single
-        r'\t+': ' ',                 # Tabs to space
-        r' +\n': '\n',              # Trailing spaces before newline
-        r'\n +': '\n',              # Leading spaces after newline
+        r"\n{3,}": "\n\n",  # Multiple newlines to double
+        r" {2,}": " ",  # Multiple spaces to single
+        r"\t+": " ",  # Tabs to space
+        r" +\n": "\n",  # Trailing spaces before newline
+        r"\n +": "\n",  # Leading spaces after newline
     }
 
     # Legal terms that should never be lowercased
     PRESERVE_CASE_TERMS: list[str] = [
-        'CEO', 'CFO', 'COO', 'CTO', 'CIO',
-        'LLC', 'Inc', 'Corp', 'Ltd', 'LP', 'LLP',
-        'USA', 'UK', 'EU', 'US', 'CA', 'NY',
-        'SEC', 'GDPR', 'HIPAA', 'SOX',
-        'Exhibit', 'Appendix', 'Schedule', 'Article', 'Section',
-        'Party A', 'Party B', 'Licensor', 'Licensee',
-        'Buyer', 'Seller', 'Lessee', 'Lessor'
+        "CEO",
+        "CFO",
+        "COO",
+        "CTO",
+        "CIO",
+        "LLC",
+        "Inc",
+        "Corp",
+        "Ltd",
+        "LP",
+        "LLP",
+        "USA",
+        "UK",
+        "EU",
+        "US",
+        "CA",
+        "NY",
+        "SEC",
+        "GDPR",
+        "HIPAA",
+        "SOX",
+        "Exhibit",
+        "Appendix",
+        "Schedule",
+        "Article",
+        "Section",
+        "Party A",
+        "Party B",
+        "Licensor",
+        "Licensee",
+        "Buyer",
+        "Seller",
+        "Lessee",
+        "Lessor",
     ]
 
     # ----- Pre‑computed attributes for speed and safety -----
@@ -75,7 +124,7 @@ class TextCleaner:
         lowercase: bool = False,
         remove_headers_footers: bool = True,
         preserve_legal_symbols: bool = True,
-        min_word_length: int = 1
+        min_word_length: int = 1,
     ):
         """
         Initialize the text cleaner.
@@ -93,25 +142,18 @@ class TextCleaner:
 
         # Build allowed character set once (if not already done at class level)
         if not TextCleaner._allowed_chars_preserve:
-            base_chars = set(
-                'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
-                '0123456789'
-                ' \n\t'
-            )
+            base_chars = set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 \n\t")
             base_chars.update(self.LEGAL_SYMBOLS)
             TextCleaner._allowed_chars_preserve = base_chars
 
         # Build combined header/footer regex once (static across instances)
         if TextCleaner._combined_header_footer_regex is None:
-           # Wrap each pattern to match the full stripped line,
+            # Wrap each pattern to match the full stripped line,
             # ignoring case and optional whitespace
-            combined = '|'.join(
-                rf'(?:{p})' for p in self.HEADER_FOOTER_PATTERNS
-            )
+            combined = "|".join(rf"(?:{p})" for p in self.HEADER_FOOTER_PATTERNS)
             # Anchor to start and end of stripped line (since we strip before matching)
             TextCleaner._combined_header_footer_regex = re.compile(
-                rf'^(?:{combined})$',
-                re.IGNORECASE
+                rf"^(?:{combined})$", re.IGNORECASE
             )
 
         # Compile normalisation patterns (instance‑level, could be class‑level too)
@@ -174,9 +216,7 @@ class TextCleaner:
         return [self.clean(text) for text in texts]
 
     def extract_clean_sections(
-        self,
-        text: str,
-        section_markers: list[str] | None = None
+        self, text: str, section_markers: list[str] | None = None
     ) -> dict[str, str]:
         """
         Extract and clean specific sections from a contract.
@@ -190,8 +230,14 @@ class TextCleaner:
         """
         if section_markers is None:
             section_markers = [
-                'ARTICLE', 'SECTION', 'CLAUSE', 'PART',
-                '§', 'Exhibit', 'Appendix', 'Schedule'
+                "ARTICLE",
+                "SECTION",
+                "CLAUSE",
+                "PART",
+                "§",
+                "Exhibit",
+                "Appendix",
+                "Schedule",
             ]
 
         # Pre‑compute upper‑case markers for faster comparison
@@ -201,7 +247,7 @@ class TextCleaner:
         current_section = "introduction"
         current_text: list[str] = []
 
-        lines = text.split('\n')
+        lines = text.split("\n")
 
         for line in lines:
             # Check for section start using uppercase strip once per line
@@ -212,7 +258,7 @@ class TextCleaner:
                 if line_stripped_upper.startswith(marker_upper):
                     # Save previous section
                     if current_text:
-                        sections[current_section] = self.clean('\n'.join(current_text))
+                        sections[current_section] = self.clean("\n".join(current_text))
 
                     # Start new section – use original stripped line (capped length)
                     current_section = line.strip()[:100]
@@ -225,7 +271,7 @@ class TextCleaner:
 
         # Don't forget the last section
         if current_text:
-            sections[current_section] = self.clean('\n'.join(current_text))
+            sections[current_section] = self.clean("\n".join(current_text))
 
         return sections
 
@@ -236,7 +282,7 @@ class TextCleaner:
         """
         Remove common header and footer patterns using a single combined regex.
         """
-        lines = text.split('\n')
+        lines = text.split("\n")
         kept_lines = []
 
         for line in lines:
@@ -245,7 +291,7 @@ class TextCleaner:
             if not TextCleaner._combined_header_footer_regex.match(stripped):
                 kept_lines.append(line)
 
-        return '\n'.join(kept_lines)
+        return "\n".join(kept_lines)
 
     def _normalize_whitespace(self, text: str) -> str:
         """Normalize whitespace and line breaks using compiled patterns."""
@@ -282,11 +328,11 @@ class TextCleaner:
         Uses pre‑computed allowed character set for speed.
         """
         allowed = TextCleaner._allowed_chars_preserve
-        return ''.join(char if char in allowed else ' ' for char in text)
+        return "".join(char if char in allowed else " " for char in text)
 
     def _remove_special_chars(self, text: str) -> str:
         """Remove all special characters (keeps alphanumeric and whitespace)."""
-        return re.sub(r'[^\w\s]', ' ', text)
+        return re.sub(r"[^\w\s]", " ", text)
 
     def _filter_short_words(self, text: str) -> str:
         """
@@ -300,4 +346,4 @@ class TextCleaner:
             if len(word) >= self.min_word_length or (len(word) == 1 and word.isalpha()):
                 filtered.append(word)
 
-        return ' '.join(filtered)
+        return " ".join(filtered)

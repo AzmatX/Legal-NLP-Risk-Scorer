@@ -34,7 +34,7 @@ class ContractSchema:
         return asdict(self)
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "ContractSchema":   
+    def from_dict(cls, data: dict[str, Any]) -> "ContractSchema":
         """
         Create a ContractSchema instance from a dictionary.
 

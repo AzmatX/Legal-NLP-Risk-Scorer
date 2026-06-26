@@ -7,7 +7,7 @@ synonyms = {
     "shall": ["must", "agrees to"],
     "customers": ["clients", "buyers"],
     "increase": ["raise", "adjust"],
-    "prices": ["pricing", "fees"]
+    "prices": ["pricing", "fees"],
 }
 
 

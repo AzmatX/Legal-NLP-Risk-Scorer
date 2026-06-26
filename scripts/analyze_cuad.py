@@ -1,7 +1,7 @@
 import json
 from collections import Counter
 
-with open("data/CUADv1.json", "r", encoding="utf-8") as f:
+with open("data/CUADv1.json", encoding="utf-8") as f:
     dataset = json.load(f)
 
 documents = dataset["data"]
@@ -10,7 +10,7 @@ label_counter = Counter()
 for doc in documents:
     for para in doc["paragraphs"]:
         for qa in para["qas"]:
-            if not qa["is_impossible"]:   # only actual clause present
+            if not qa["is_impossible"]:  # only actual clause present
                 label = qa["id"].split("__")[-1]
                 label_counter[label] += 1
 

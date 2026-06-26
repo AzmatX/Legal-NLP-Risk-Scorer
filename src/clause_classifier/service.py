@@ -9,10 +9,11 @@ with contract-level summary.
 # ✅ correct relative import – goes up to 'src', then into 'clause_segmentation'
 
 import re
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 # Import the segmentation module
-from ..clause_segmentation import segment_contract, Clause
+from ..clause_segmentation import Clause, segment_contract
+
 # Legal clause types commonly found in contracts (CUAD dataset categories)
 LEGAL_CLAUSE_TYPES = [
     "governing_law",
@@ -41,7 +42,7 @@ LEGAL_CLAUSE_TYPES = [
     "publicity",
     "audit_rights",
     "data_protection",
-    "subcontracting"
+    "subcontracting",
 ]
 
 
@@ -66,13 +67,14 @@ class ClauseClassifier:
         # Try to load transformers
         try:
             from transformers import AutoModelForSequenceClassification, AutoTokenizer
+
             self.AutoTokenizer = AutoTokenizer
             self.AutoModelForSequenceClassification = AutoModelForSequenceClassification
             self.TRANSFORMERS_AVAILABLE = True
         except ImportError:
             self.TRANSFORMERS_AVAILABLE = False
 
-    def load_model(self, fine_tuned_path: Optional[str] = None):
+    def load_model(self, fine_tuned_path: str | None = None):
         """
         Load the pre-trained/fine-tuned model.
 
@@ -86,8 +88,7 @@ class ClauseClassifier:
             model_to_load = fine_tuned_path or "roberta-base"
             self.tokenizer = self.AutoTokenizer.from_pretrained(model_to_load)
             self.model = self.AutoModelForSequenceClassification.from_pretrained(
-                model_to_load,
-                num_labels=len(LEGAL_CLAUSE_TYPES)
+                model_to_load, num_labels=len(LEGAL_CLAUSE_TYPES)
             )
             self._model_loaded = True
         except Exception:
@@ -96,7 +97,7 @@ class ClauseClassifier:
     # ------------------------------------------------------------
     # Single clause classification (existing)
     # ------------------------------------------------------------
-    def classify_clause(self, text: str) -> Dict[str, Any]:
+    def classify_clause(self, text: str) -> dict[str, Any]:
         """
         Classify a single legal clause.
 
@@ -121,11 +122,7 @@ class ClauseClassifier:
             import torch.nn.functional as F
 
             inputs = self.tokenizer(
-                text,
-                return_tensors="pt",
-                truncation=True,
-                max_length=512,
-                padding=True
+                text, return_tensors="pt", truncation=True, max_length=512, padding=True
             )
 
             with torch.no_grad():
@@ -142,19 +139,19 @@ class ClauseClassifier:
                 "all_scores": {
                     LEGAL_CLAUSE_TYPES[i]: f"{probabilities[i].item():.4f}"
                     for i in range(len(LEGAL_CLAUSE_TYPES))
-                }
+                },
             }
         except Exception:
             return self._heuristic_classify(text)
 
-    def classify_multiple_clauses(self, clauses: List[str]) -> List[Dict[str, Any]]:
+    def classify_multiple_clauses(self, clauses: list[str]) -> list[dict[str, Any]]:
         """Batch classify a list of clause texts."""
         return [self.classify_clause(clause) for clause in clauses]
 
     # ------------------------------------------------------------
     # Heuristic fallback (unchanged)
     # ------------------------------------------------------------
-    def _heuristic_classify(self, text: str) -> Dict[str, Any]:
+    def _heuristic_classify(self, text: str) -> dict[str, Any]:
         """Fallback heuristic-based classification using keyword matching."""
         text_lower = text.lower()
 
@@ -189,7 +186,7 @@ class ClauseClassifier:
             "publicity": r"publicity|press release|public announcement",
             "audit_rights": r"audit|examination|records inspection",
             "data_protection": r"data protection|privacy|GDPR|personal data",
-            "subcontracting": r"subcontract|subcontractor|delegate"
+            "subcontracting": r"subcontract|subcontractor|delegate",
         }
 
         best_match = None
@@ -202,17 +199,14 @@ class ClauseClassifier:
 
         if best_match and best_score > 0:
             confidence = min(0.95, 0.5 + (best_score * 0.15))
-            return {
-                "label": best_match,
-                "confidence": f"{confidence:.2f}"
-            }
+            return {"label": best_match, "confidence": f"{confidence:.2f}"}
 
         return {"label": "other", "confidence": "0.50"}
 
     # ------------------------------------------------------------
     # NEW: Full contract classification (with segmentation)
     # ------------------------------------------------------------
-    def classify_contract(self, contract_text: str) -> Dict[str, Any]:
+    def classify_contract(self, contract_text: str) -> dict[str, Any]:
         """
         Classify each clause in a full contract after automatic segmentation.
 
@@ -223,7 +217,7 @@ class ClauseClassifier:
             - "risk_factors": list of high‑risk clause types present (optional)
         """
         # 1. Segment the contract
-        clauses: List[Clause] = segment_contract(contract_text)
+        clauses: list[Clause] = segment_contract(contract_text)
 
         # 2. Classify each clause
         results = []
@@ -236,7 +230,7 @@ class ClauseClassifier:
                 "start_char": clause.start_char,
                 "end_char": clause.end_char,
                 "label": classification.get("label", "unknown"),
-                "confidence": classification.get("confidence", "0.00")
+                "confidence": classification.get("confidence", "0.00"),
             }
             results.append(result)
 
@@ -245,10 +239,7 @@ class ClauseClassifier:
             type_counts[label] = type_counts.get(label, 0) + 1
 
         # 3. Build summary
-        summary = {
-            "total_clauses": len(results),
-            "type_counts": type_counts
-        }
+        summary = {"total_clauses": len(results), "type_counts": type_counts}
 
         # 4. (Optional) Identify high‑risk clauses – e.g., termination, indemnification
         #    We'll treat 'termination_for_cause' and 'indemnification' as risk factors.
@@ -266,14 +257,14 @@ class ClauseClassifier:
 # ------------------------------------------------------------
 # Convenience functions (backward compatible)
 # ------------------------------------------------------------
-def classify_clause(text: str) -> Dict[str, str]:
+def classify_clause(text: str) -> dict[str, str]:
     """Classify a single clause (convenience)."""
     classifier = ClauseClassifier()
     result = classifier.classify_clause(text)
     return {"label": result["label"], "confidence": result["confidence"]}
 
 
-def classify_contract(contract_text: str) -> Dict[str, Any]:
+def classify_contract(contract_text: str) -> dict[str, Any]:
     """Classify all clauses in a full contract (convenience)."""
     classifier = ClauseClassifier()
     return classifier.classify_contract(contract_text)

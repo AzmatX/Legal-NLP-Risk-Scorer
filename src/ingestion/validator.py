@@ -50,28 +50,24 @@ class ContractValidator:
 
     # Supported file types with their magic bytes
     SUPPORTED_FORMATS: dict[str, dict[str, Any]] = {
-        '.pdf': {
-            'magic_bytes': b'%PDF',
-            'mime_types': ['application/pdf'],
-            'description': 'Portable Document Format'
+        ".pdf": {
+            "magic_bytes": b"%PDF",
+            "mime_types": ["application/pdf"],
+            "description": "Portable Document Format",
         },
-        '.docx': {
-            'magic_bytes': b'PK\x03\x04',  # ZIP signature
-            'mime_types': [
-                'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        ".docx": {
+            "magic_bytes": b"PK\x03\x04",  # ZIP signature
+            "mime_types": [
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
             ],
-            'description': 'Microsoft Word Document'
+            "description": "Microsoft Word Document",
         },
-        '.json': {
-            'magic_bytes': None,
-            'mime_types': ['application/json'],
-            'description': 'JSON Data Format'
+        ".json": {
+            "magic_bytes": None,
+            "mime_types": ["application/json"],
+            "description": "JSON Data Format",
         },
-        '.txt': {
-            'magic_bytes': None,
-            'mime_types': ['text/plain'],
-            'description': 'Plain Text'
-        }
+        ".txt": {"magic_bytes": None, "mime_types": ["text/plain"], "description": "Plain Text"},
     }
 
     def __init__(
@@ -119,26 +115,22 @@ class ContractValidator:
             ContractValidationError: If any check fails.
         """
         if not file_name:
-            raise ContractValidationError(
-                "File name is required", error_code="MISSING_FILENAME"
-            )
+            raise ContractValidationError("File name is required", error_code="MISSING_FILENAME")
         if not text:
-            raise ContractValidationError(
-                "Contract text is empty", error_code="EMPTY_CONTENT"
-            )
+            raise ContractValidationError("Contract text is empty", error_code="EMPTY_CONTENT")
 
         stripped_len = len(text.strip())
         if stripped_len < self.min_text_length:
             raise ContractValidationError(
                 f"Contract text must contain at least {self.min_text_length} characters. "
                 f"Current length: {stripped_len}",
-                error_code="TEXT_TOO_SHORT"
+                error_code="TEXT_TOO_SHORT",
             )
         if stripped_len > self.max_text_length:
             raise ContractValidationError(
                 f"Contract text exceeds maximum length of {self.max_text_length} characters. "
                 f"Current length: {stripped_len}",
-                error_code="TEXT_TOO_LONG"
+                error_code="TEXT_TOO_LONG",
             )
 
         if self.check_content_quality:
@@ -185,27 +177,25 @@ class ContractValidator:
             raise ContractValidationError(
                 f"Unsupported file type: {file_type}. "
                 f"Supported: {', '.join(self.SUPPORTED_FORMATS.keys())}",
-                error_code="UNSUPPORTED_FORMAT"
+                error_code="UNSUPPORTED_FORMAT",
             )
 
         if self.check_file_size:
             if file_size < self.MIN_FILE_SIZE:
-                raise ContractValidationError(
-                    "File is empty", error_code="EMPTY_FILE"
-                )
+                raise ContractValidationError("File is empty", error_code="EMPTY_FILE")
             if file_size > self.MAX_FILE_SIZE:
                 raise ContractValidationError(
                     f"File too large: {file_size} bytes (max {self.MAX_FILE_SIZE})",
-                    error_code="FILE_TOO_LARGE"
+                    error_code="FILE_TOO_LARGE",
                 )
 
         logger.info("File validation successful: %s (%s bytes)", path.name, file_size)
         return {
-            'file_path': str(path),
-            'file_name': path.name,
-            'file_size': file_size,
-            'file_type': file_type,
-            'file_type_info': self.SUPPORTED_FORMATS[file_type],
+            "file_path": str(path),
+            "file_name": path.name,
+            "file_size": file_size,
+            "file_type": file_type,
+            "file_type_info": self.SUPPORTED_FORMATS[file_type],
         }
 
     # ------------------------------------------------------------------
@@ -231,51 +221,51 @@ class ContractValidator:
         path = Path(file_path)
         file_type = path.suffix.lower()
         result = {
-            'valid': False,
-            'file_path': str(path),
-            'checksum': None,
-            'magic_bytes_match': None,
-            'format_supported': False,
-            'errors': []
+            "valid": False,
+            "file_path": str(path),
+            "checksum": None,
+            "magic_bytes_match": None,
+            "format_supported": False,
+            "errors": [],
         }
 
         format_info = self.SUPPORTED_FORMATS.get(file_type)
         if format_info is None:
-            result['errors'].append(f"Unsupported file type: {file_type}")
+            result["errors"].append(f"Unsupported file type: {file_type}")
             return result
 
-        result['format_supported'] = True
-        expected_magic = format_info.get('magic_bytes')
+        result["format_supported"] = True
+        expected_magic = format_info.get("magic_bytes")
         magic_check_needed = expected_magic is not None
 
         try:
-            with open(path, 'rb') as f:
+            with open(path, "rb") as f:
                 # Read first 16 bytes for magic check
                 header = f.read(16)
 
                 if magic_check_needed:
                     if header.startswith(expected_magic):
-                        result['magic_bytes_match'] = True
+                        result["magic_bytes_match"] = True
                     else:
-                        result['errors'].append(
+                        result["errors"].append(
                             f"File header does not match expected format for {file_type}"
                         )
                 else:
-                    result['magic_bytes_match'] = None  # N/A
+                    result["magic_bytes_match"] = None  # N/A
 
                 # Compute MD5: start from what we already have
                 hasher = hashlib.md5()
                 hasher.update(header)
 
                 # Read the rest in chunks
-                for chunk in iter(lambda: f.read(8192), b''):
+                for chunk in iter(lambda: f.read(8192), b""):
                     hasher.update(chunk)
 
-            result['checksum'] = hasher.hexdigest()
-            result['valid'] = len(result['errors']) == 0
+            result["checksum"] = hasher.hexdigest()
+            result["valid"] = len(result["errors"]) == 0
 
         except OSError as e:
-            result['errors'].append(f"Integrity check failed: {e}")
+            result["errors"].append(f"Integrity check failed: {e}")
 
         return result
 
@@ -294,35 +284,31 @@ class ContractValidator:
                 - error: error message if invalid
         """
         result: dict[str, Any] = {
-            'valid': False,
-            'is_list': False,
-            'is_dict': False,
-            'keys': [],
-            'error': None
+            "valid": False,
+            "is_list": False,
+            "is_dict": False,
+            "keys": [],
+            "error": None,
         }
         try:
             data = json.loads(text)
-            result['valid'] = True
-            result['is_list'] = isinstance(data, list)
-            result['is_dict'] = isinstance(data, dict)
+            result["valid"] = True
+            result["is_list"] = isinstance(data, list)
+            result["is_dict"] = isinstance(data, dict)
 
             if isinstance(data, dict):
-                result['keys'] = list(data.keys())
+                result["keys"] = list(data.keys())
             elif isinstance(data, list) and data and isinstance(data[0], dict):
-                result['keys'] = list(data[0].keys())
+                result["keys"] = list(data[0].keys())
         except json.JSONDecodeError as e:
-            result['error'] = f"Invalid JSON: {e}"
+            result["error"] = f"Invalid JSON: {e}"
 
         return result
 
     # ------------------------------------------------------------------
     # Report generation
     # ------------------------------------------------------------------
-    def get_validation_report(
-        self,
-        file_path: str,
-        text: str | None = None
-    ) -> dict[str, Any]:
+    def get_validation_report(self, file_path: str, text: str | None = None) -> dict[str, Any]:
         """
         Generate a comprehensive validation report.
 
@@ -334,34 +320,31 @@ class ContractValidator:
             Dictionary with overall_valid flag and per‑check results.
         """
         report: dict[str, Any] = {
-            'file_path': file_path,
-            'timestamp': datetime.now(UTC).isoformat(),
-            'overall_valid': False,
-            'checks': {}
+            "file_path": file_path,
+            "timestamp": datetime.now(UTC).isoformat(),
+            "overall_valid": False,
+            "checks": {},
         }
 
         # 1. File metadata validation
         try:
             file_meta = self.validate_file_path(file_path)
-            report['checks']['file_metadata'] = {
-                'passed': True,
-                'data': file_meta
-            }
+            report["checks"]["file_metadata"] = {"passed": True, "data": file_meta}
         except ContractValidationError as e:
-            report['checks']['file_metadata'] = {
-                'passed': False,
-                'error': str(e),
-                'error_code': e.error_code
+            report["checks"]["file_metadata"] = {
+                "passed": False,
+                "error": str(e),
+                "error_code": e.error_code,
             }
             return report  # Cannot proceed further without valid file
 
         # 2. File integrity
         integrity = self.validate_file_integrity(file_path)
-        report['checks']['integrity'] = {
-            'passed': integrity['valid'],
-            'checksum': integrity['checksum'],
-            'magic_bytes_match': integrity['magic_bytes_match'],
-            'errors': integrity['errors']
+        report["checks"]["integrity"] = {
+            "passed": integrity["valid"],
+            "checksum": integrity["checksum"],
+            "magic_bytes_match": integrity["magic_bytes_match"],
+            "errors": integrity["errors"],
         }
 
         # 3. Content validation (if text provided)
@@ -369,23 +352,22 @@ class ContractValidator:
             content_check = {}
             try:
                 self.validate(Path(file_path).name, text)
-                content_check['passed'] = True
-                content_check['text_length'] = len(text)
+                content_check["passed"] = True
+                content_check["text_length"] = len(text)
             except ContractValidationError as e:
-                content_check['passed'] = False
-                content_check['error'] = str(e)
-                content_check['error_code'] = e.error_code
+                content_check["passed"] = False
+                content_check["error"] = str(e)
+                content_check["error_code"] = e.error_code
 
-            report['checks']['content'] = content_check
+            report["checks"]["content"] = content_check
 
             # 4. JSON structure (if applicable)
-            if Path(file_path).suffix.lower() == '.json':
-                report['checks']['json_structure'] = self.validate_json_structure(text)
+            if Path(file_path).suffix.lower() == ".json":
+                report["checks"]["json_structure"] = self.validate_json_structure(text)
 
         # Determine overall validity
-        report['overall_valid'] = all(
-            check.get('passed', False)
-            for check in report['checks'].values()
+        report["overall_valid"] = all(
+            check.get("passed", False) for check in report["checks"].values()
         )
         return report
 
@@ -422,13 +404,13 @@ class ContractValidator:
 
         if alpha_ratio < self.min_alphabetic_ratio:
             logger.warning(
-                "Low alphabetic ratio (%.2f) in %s – possible corruption",
-                alpha_ratio, file_name
+                "Low alphabetic ratio (%.2f) in %s – possible corruption", alpha_ratio, file_name
             )
         if special_ratio > self.max_special_char_ratio:
             logger.warning(
                 "High special character ratio (%.2f) in %s – possible noise",
-                special_ratio, file_name
+                special_ratio,
+                file_name,
             )
 
         # Optionally raise an error if needed:
