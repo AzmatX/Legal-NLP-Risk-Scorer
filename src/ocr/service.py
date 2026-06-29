@@ -85,6 +85,7 @@ class OptimizedOCRProcessor:
         # Tesseract
         try:
             import pytesseract
+
             pytesseract.get_tesseract_version()
             self.tesseract_available = True
             logger.info("✅ Tesseract available")
@@ -94,6 +95,7 @@ class OptimizedOCRProcessor:
         # EasyOCR
         try:
             import easyocr  # noqa: F401
+
             self.easyocr_available = True
             logger.info("✅ EasyOCR available")
         except ImportError:
@@ -102,6 +104,7 @@ class OptimizedOCRProcessor:
         # PaddleOCR
         try:
             import paddleocr  # noqa: F401
+
             self.paddleocr_available = True
             logger.info("✅ PaddleOCR available")
         except ImportError:
@@ -110,6 +113,7 @@ class OptimizedOCRProcessor:
         # pdf2image
         try:
             from pdf2image import convert_from_bytes  # noqa: F401
+
             self.pdf2image_available = True
             logger.info("✅ pdf2image available")
         except ImportError:
@@ -118,18 +122,21 @@ class OptimizedOCRProcessor:
     def _get_tesseract(self):
         if self._tesseract is None and self.tesseract_available:
             import pytesseract
+
             self._tesseract = pytesseract
         return self._tesseract
 
     def _get_easyocr(self):
         if self._easyocr_reader is None and self.easyocr_available:
             import easyocr
+
             self._easyocr_reader = easyocr.Reader(["en"], gpu=False, verbose=False)
         return self._easyocr_reader
 
     def _get_paddleocr(self):
         if self._paddle_ocr is None and self.paddleocr_available:
             from paddleocr import PaddleOCR
+
             self._paddle_ocr = PaddleOCR(use_angle_cls=True, lang="en", show_log=False)
         return self._paddle_ocr
 
@@ -231,6 +238,7 @@ class OptimizedOCRProcessor:
             ocr = self._get_paddleocr()
             if ocr:
                 import numpy as np
+
                 res = ocr.ocr(np.array(image), cls=True)
                 if res and res[0]:
                     return "\n".join([line[1][0] for line in res[0]])

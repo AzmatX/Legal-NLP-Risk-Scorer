@@ -1,7 +1,8 @@
 # force_load_cuad.py
-from datasets import load_dataset
 import json
 from pathlib import Path
+
+from datasets import load_dataset
 
 # data folder banayein
 Path("data").mkdir(exist_ok=True)
@@ -10,11 +11,7 @@ print("🔄 Force downloading/loading CUAD dataset with no checks...")
 print("(Cache delete kiya tha toh naya download hoga, thoda wait karo)")
 
 # verification_mode='no_checks' bypass karega mismatch error
-ds = load_dataset(
-    "theatticusproject/cuad", 
-    split="train", 
-    verification_mode="no_checks"
-)
+ds = load_dataset("theatticusproject/cuad", split="train", verification_mode="no_checks")
 
 print(f"✅ FORCE LOADED {len(ds)} ROWS!")
 

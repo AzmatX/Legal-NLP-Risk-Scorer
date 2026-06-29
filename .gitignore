@@ -33,4 +33,4 @@ dist/
 .idea/
 *.swp
 *.swo
-*.tmp
+*.tmp.vs/

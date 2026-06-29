@@ -23,20 +23,22 @@ for doc_idx, doc in enumerate(raw["data"]):
             # Sirf Positive samples lo (jinme clause exist karta hai)
             if qa.get("is_impossible", False):
                 continue
-            
+
             question = qa.get("question", "")
             # Label nikaalo (e.g., "governing_law")
             match = re.search(r'"([^"]+)"', question)
             label = match.group(1) if match else "unknown"
-            
+
             # Answers (clause text) lo
             for ans in qa.get("answers", []):
-                samples.append({
-                    "context": context,
-                    "question": question,
-                    "label": label,
-                    "answer_text": ans["text"]
-                })
+                samples.append(
+                    {
+                        "context": context,
+                        "question": question,
+                        "label": label,
+                        "answer_text": ans["text"],
+                    }
+                )
 
 print(f"🔥 Total Labeled Clause Samples Extracted: {len(samples)}")
 
@@ -48,11 +50,11 @@ with open(output_path, "w", encoding="utf-8") as f:
         f.write("\n")
 
 print(f"✅ Saved to: {output_path.absolute()}")
-print(f"📦 File Size: {output_path.stat().st_size // (1024*1024)} MB")
+print(f"📦 File Size: {output_path.stat().st_size // (1024 * 1024)} MB")
 
 # Sample Check
 print("\n📊 Sample Check (Pehle 2):")
 for i in range(min(2, len(samples))):
-    print(f"\n--- Sample {i+1} ---")
+    print(f"\n--- Sample {i + 1} ---")
     print(f"Label: {samples[i]['label']}")
     print(f"Answer: {samples[i]['answer_text'][:150]}...")

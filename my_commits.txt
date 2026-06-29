@@ -1,0 +1,135 @@
+56627b7 Mid-review: Final prep & critical fixes
+ 32 files changed, 14655 insertions(+), 25270 deletions(-)
+46d0d36 fix: resolve Ruff lint issues and modernize type hints
+ 26 files changed, 562 insertions(+), 575 deletions(-)
+7ddb7ee Describe your changes
+ 14 files changed, 962 insertions(+), 81 deletions(-)
+061859b Add files via upload
+ 6 files changed, 0 insertions(+), 0 deletions(-)
+fcfe24e Enhance README with technology badges and updates
+ 1 file changed, 61 insertions(+), 3 deletions(-)
+2efaa88 Revise README for project overview and guidelines
+ 1 file changed, 137 insertions(+), 57 deletions(-)
+950fd6f chore: remove tracked cache artifacts and tighten gitignore
+ 10 files changed, 18 insertions(+), 174 deletions(-)
+8cb7007 test+lint: stabilize ingestion pipeline and clean code quality issues
+ 9 files changed, 116 insertions(+), 47 deletions(-)
+94c18be fix: repair ingestion test suite and day2 pytest cases
+ 2 files changed, 45 insertions(+), 28 deletions(-)
+7b606f3 Merge branch 'main' of https://github.com/AzmatX/Legal-NLP-Risk-Scorer
+ccfe11e Initial commit
+ 76 files changed, 29044 insertions(+)
+1a5b6c3 perf(ingestion): optimize runtime and enhance code quality
+7a76678 Merge branch 'main' into fix/ruff-phase-b
+1765804 perf(ingestion): optimize runtime and enhance code quality
+ 6 files changed, 789 insertions(+), 537 deletions(-)
+0f28495 Fix ingestion section extraction test
+ 1 file changed, 12 insertions(+), 13 deletions(-)
+7fb4c07 Merge pull request #17 from AzmatX/fix/ruff-phase-b
+79c0a7a Merge branch 'main' into fix/ruff-phase-b
+2fa7b2a fix: resolve ruff and ingestion test issues
+ 6 files changed, 22371 insertions(+), 44 deletions(-)
+0d1147d Revise test suite for Enhanced Data Ingestion Pipeline
+ 1 file changed, 299 insertions(+), 299 deletions(-)
+59378c8 Optimize OCR pipeline with multi-engine support
+ 1 file changed, 494 insertions(+), 221 deletions(-)
+1f046f5 Enhance contract validator for legal documents
+ 1 file changed, 427 insertions(+), 7 deletions(-)
+6e25538 Enhance text cleaner for legal contract documents
+ 1 file changed, 284 insertions(+), 6 deletions(-)
+5e5a68b Refactor .gitignore for Python and environment settings
+ 1 file changed, 18 insertions(+), 40 deletions(-)
+0e86c95 Update Merge Plan.md
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+e6ce5f0 Add project banner to README
+ 1 file changed, 1 insertion(+)
+53c0a11 Add files via upload
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+40854ab Revise CONTRIBUTING.md with contributor details
+ 1 file changed, 31 insertions(+), 17 deletions(-)
+7c34389 Revise Code of Conduct with detailed guidelines
+ 1 file changed, 52 insertions(+), 7 deletions(-)
+4ec64fc docs: establish professional project documentation
+ 1 file changed, 78 insertions(+), 79 deletions(-)
+c089cbb test: skip CUAD dataset test
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+748d504 test: skip dataset-dependent CUAD parser test
+ 1 file changed, 5 insertions(+), 19 deletions(-)
+45265bb fix: resolve ruff E402 import order
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+026c041 fix: resolve CI import and test issues
+ 5 files changed, 15 insertions(+), 9 deletions(-)
+24fab79 chore: ignore author mapping artifact
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+49c9417 chore: remove accidental empty file
+ 19 files changed, 0 insertions(+), 0 deletions(-)
+23dbe45 Unify contributor identities
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+a968330 Update mailmap identities
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+d8bfadd Add mailmap
+ 1 file changed, 3 insertions(+)
+b5b6931 Merge pull request #12 from AzmatX/fix-ci-import-issue
+1f1937c fix: resolve CI ModuleNotFoundError and improve code quality
+ 10 files changed, 389 insertions(+), 69 deletions(-)
+0866ad8 Merge pull request #10 from AzmatX/legal-document-ner-model-development-52aa0
+7b6015a Merge pull request #11 from AzmatX/develop
+4ebd8e8 update branch
+ 5 files changed, 2145 insertions(+), 30 deletions(-)
+2530f4b fix: resolve pytest import path issue for GitHub Actions
+ 2 files changed, 3 insertions(+), 2 deletions(-)
+4f492d9 Merge pull request #9 from AzmatX/legal-document-ner-model-development-52aa0
+9346d15 Title: Repository maintenance and review readiness preparation
+ 10 files changed, 142 insertions(+), 10 deletions(-)
+10913dc docs: professionalize README and add review readiness report
+ 1 file changed, 257 insertions(+)
+a674146 fix: resolve linting and code quality issues
+ 5 files changed, 76 insertions(+), 62 deletions(-)
+aabc71e Merge pull request #8 from AzmatX/qwen-code-468952ba-621d-4265-93f2-57cd61352aa0
+36619ab Merge branch 'main' into qwen-code-468952ba-621d-4265-93f2-57cd61352aa0
+e599a8f docs: update README with project status and neutral maintenance structure
+ 1 file changed, 46 insertions(+), 24 deletions(-)
+d7b9ea6 Correct spelling of 'Sandeep Singh' in README
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+a7ca96e test: add comprehensive tests for dataset ingestion pipeline
+ 1 file changed, 313 insertions(+)
+7af22a1 feat: enhance NER with class-based processor and legal entity patterns
+ 1 file changed, 316 insertions(+), 59 deletions(-)
+f6fcd59 feat: enhance OCR pipeline with advanced document processing
+ 1 file changed, 252 insertions(+), 29 deletions(-)
+10a0e6d feat: implement dataset ingestion pipeline for CUAD processing
+ 1 file changed, 261 insertions(+), 2 deletions(-)
+423ace7 Implement OCR pipeline, NER with spaCy, and clause classifier
+ 3 files changed, 429 insertions(+), 7 deletions(-)
+34fce33 Add project audit and migration reports
+ 5 files changed, 391 insertions(+)
+32a5710 Update README.md
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+2e64dc4 Update README.md
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+5e8b174 Update README.md
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+97e54ab Update README.md
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+3c5cca1 Update README.md
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+776d167 Update README.md
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+7b48183 Merge pull request #3 from AzmatX/copilot/update-docs-and-md
+8ed04c2 Align markdown ownership and assignees
+ 8 files changed, 34 insertions(+), 28 deletions(-)
+1f192ab Revise README with branch strategy and team roles
+ 1 file changed, 31 insertions(+), 11 deletions(-)
+f61c496 Merge pull request #2 from AzmatX/copilot/update-development-guide
+1aac831 Add branching, setup, and issue template documentation
+ 13 files changed, 280 insertions(+)
+b04606d Merge pull request #1 from AzmatX/copilot/ai-powered-contract-intelligence-system
+c14f881 fix: prevent CodeQL job failure when code scanning is disabled
+ 1 file changed, 2 insertions(+)
+334c973 Harden workflow token permissions
+ 2 files changed, 6 insertions(+)
+a5f936e Bootstrap production-grade NLP platform scaffold
+ 36 files changed, 572 insertions(+), 2 deletions(-)
+7314bdc Initial plan
+9e24d22 Initial commit
+ 1 file changed, 2 insertions(+)

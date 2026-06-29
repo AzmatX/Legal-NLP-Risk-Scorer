@@ -10,23 +10,26 @@ from src.ocr.service import extract_text_from_document
 from src.risk_scoring.service import score_contract
 from src.utils.config import settings
 
+
 # ---------- Lifespan: Load heavy models once ----------
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup: Pre-load NER/Classifier models (avoid lazy loading per request)
     print("🚀 Loading NER and Classifier models on startup...")
-    from src.ner.service import _get_default_processor
     from src.clause_classifier.service import ClauseClassifier
+    from src.ner.service import _get_default_processor
+
     _get_default_processor()  # Load spaCy
-    ClauseClassifier()        # Load transformer (or dummy)
+    ClauseClassifier()  # Load transformer (or dummy)
     print("✅ Models loaded!")
     yield
     # Shutdown: Cleanup if needed
     print("🛑 Shutting down...")
 
+
 # ---------- FastAPI App ----------
 app = FastAPI(
-    title=settings.APP_NAME,           # ✅ FIX: Uppercase APP_NAME
+    title=settings.APP_NAME,  # ✅ FIX: Uppercase APP_NAME
     version=settings.APP_VERSION,
     lifespan=lifespan,
 )
@@ -40,10 +43,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 # ---------- Health Check ----------
 @app.get("/health")
 def health() -> dict[str, str]:
     return {"status": "ok", "service": settings.APP_NAME}
+
 
 # ---------- Analyze Contract ----------
 @app.post("/contracts/analyze")

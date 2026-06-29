@@ -1,7 +1,7 @@
 import json
 import re
-from pathlib import Path
 from collections import Counter
+from pathlib import Path
 
 print("🚀 Directly creating lightweight dataset from CUAD_v1.json...")
 
@@ -21,18 +21,15 @@ for doc in raw["data"]:
         for qa in para.get("qas", []):
             if qa.get("is_impossible", False):
                 continue
-            
+
             question = qa.get("question", "")
             # Label extract karo (e.g., "governing_law")
             match = re.search(r'"([^"]+)"', question)
             label = match.group(1) if match else "unknown"
-            
+
             # Sirf answer text (clause text) lo. Context nahi lena.
             for ans in qa.get("answers", []):
-                samples.append({
-                    "text": ans["text"].strip(),
-                    "label": label
-                })
+                samples.append({"text": ans["text"].strip(), "label": label})
 
 print(f"🔥 Total Labeled Clauses Extracted: {len(samples)}")
 

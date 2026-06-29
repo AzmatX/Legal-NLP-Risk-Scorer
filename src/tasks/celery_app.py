@@ -1,4 +1,5 @@
 import os
+
 from celery import Celery
 
 # Read from environment (set in docker-compose.yml)
@@ -25,6 +26,7 @@ celery_app.conf.update(
 
 # Automatically discover tasks from all registered modules
 celery_app.autodiscover_tasks(["src.tasks"])
+
 
 # Health check for broker
 @celery_app.task(name="tasks.ping")

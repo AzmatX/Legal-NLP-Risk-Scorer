@@ -5,10 +5,12 @@ from tasks.celery_app import celery_app
 
 logger = logging.getLogger(__name__)
 
+
 # ---------- Health check (lightweight) ----------
 @celery_app.task(name="tasks.healthcheck")
 def healthcheck() -> str:
     return "ok"
+
 
 # ---------- Heavy background task ----------
 @celery_app.task(name="tasks.process_contract", bind=True)
@@ -21,9 +23,9 @@ def process_contract_background(self, file_content: bytes, filename: str) -> dic
     self.update_state(state="PROGRESS", meta={"status": "Extracting text..."})
 
     # Import heavy modules ONLY inside the task (so worker starts fast)
-    from src.ocr.service import extract_text_from_document
-    from src.ner.service import extract_legal_entities
     from src.clause_classifier.service import classify_contract
+    from src.ner.service import extract_legal_entities
+    from src.ocr.service import extract_text_from_document
     from src.risk_scoring.service import score_contract
 
     try:

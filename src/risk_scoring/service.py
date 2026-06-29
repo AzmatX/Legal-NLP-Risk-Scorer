@@ -140,15 +140,11 @@ def score_contract(clause_result: dict[str, Any]) -> dict[str, Any]:
     recommendations: list[str] = []
 
     for clause in missing:
-        recommendations.append(
-            f"Add {clause.replace('_', ' ').title()} clause"
-        )
+        recommendations.append(f"Add {clause.replace('_', ' ').title()} clause")
 
     for item in risk_breakdown:
         if item["weight"] >= HIGH_RISK_WEIGHT_THRESHOLD:
-            recommendations.append(
-                f"Review {item['clause'].replace('_', ' ').title()} obligations"
-            )
+            recommendations.append(f"Review {item['clause'].replace('_', ' ').title()} obligations")
 
     unknown_count = type_counts.get("unknown", 0)
 
