@@ -11,8 +11,11 @@ with contract-level summary.
 import re
 from typing import Any
 
-# Import the segmentation module
-from ..clause_segmentation import Clause, segment_contract
+# Import the segmentation module (supports both package execution styles)
+try:
+    from src.clause_segmentation import Clause, segment_contract
+except ImportError:
+    from clause_segmentation import Clause, segment_contract
 
 # Legal clause types commonly found in contracts (CUAD dataset categories)
 LEGAL_CLAUSE_TYPES = [
